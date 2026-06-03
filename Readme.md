@@ -18,5 +18,3 @@ To be sure it is working:
 	2. Inventory Menu (prefab)
 
 4. Some scripts might need small assignments from inspector panel.
-
-To Access the Projects files thorugh GitHub:
