@@ -4,6 +4,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 #endif
 
 public enum InputMaps
@@ -17,6 +18,7 @@ public class StarterAssetsInputs : MonoBehaviour
 {
 		[Header("Inputs")]
 		[SerializeField] private PlayerInput playerInput;
+		[SerializeField] private InputActionReference guardActionRef;
 		private const string roamMapName = "Roam";
 		private const string UIMapName = "UI";
 		private InputMaps previousInputMap;
@@ -27,6 +29,7 @@ public class StarterAssetsInputs : MonoBehaviour
 		public Vector2 look;
 		public bool jump;
 		public bool sprint;
+		public bool guard;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -35,14 +38,15 @@ public class StarterAssetsInputs : MonoBehaviour
 		public bool cursorLocked = true;
 		public bool cursorInputForLook = true;
 		
-		// Events
+#region Events
 		public static event Action OnInventoryInterfaceOpened;
 		public static event Action OnSlashFired;
 		public static event Action OnWithdrawFired;
 		public static event Action OnShootFired;
+		public static event Action<bool> OnGuardFired;
+#endregion
 
-
-
+#region Unity Funcs.
         void OnValidate()
         {
             if (playerInput == null) {playerInput = GetComponent<PlayerInput>();}
@@ -54,6 +58,28 @@ public class StarterAssetsInputs : MonoBehaviour
 			playerInput.defaultActionMap = roamMapName;
         }
 
+	    void OnEnable()
+    	{
+			if (guardActionRef != null && guardActionRef.action != null)
+			{
+				guardActionRef.action.Enable();
+
+				guardActionRef.action.performed += ctx => HandleGuardInput(ctx);
+				guardActionRef.action.canceled += ctx => HandleGuardInput(ctx);
+			}
+    	}
+
+	    void OnDisable()
+    	{
+			if (guardActionRef != null && guardActionRef.action != null)
+			{
+				guardActionRef.action.performed -= ctx => HandleGuardInput(ctx);
+				guardActionRef.action.canceled -= ctx => HandleGuardInput(ctx);
+
+				guardActionRef.action.Disable();
+			}
+    	}
+#endregion
 
 #region Input Events
 #if ENABLE_INPUT_SYSTEM
@@ -111,6 +137,11 @@ public class StarterAssetsInputs : MonoBehaviour
 			if (!value.isPressed) return;
 			OnShootFired?.Invoke();
 		}
+
+		private void HandleGuardInput(InputAction.CallbackContext context)
+		{
+			GuardInput(context.ReadValueAsButton());
+		}
 #endif
 #endregion
 
@@ -133,6 +164,13 @@ public class StarterAssetsInputs : MonoBehaviour
 		public void SprintInput(bool newSprintState)
 		{
 			sprint = newSprintState;
+		}
+
+		public void GuardInput(bool newGuardState)
+		{
+			if (guard == newGuardState) return;
+			guard = newGuardState;
+			OnGuardFired?.Invoke(guard);
 		}
 
 #endregion
@@ -177,13 +215,9 @@ public class StarterAssetsInputs : MonoBehaviour
 				playerInput.SwitchCurrentActionMap(roamMapName);
 				currentInputMap = InputMaps.Roam;
 				cursorLocked = true;
-				SetCursorState(cursorLocked);
-				Debug.Log("Changed Input Map to Roam");	
+				SetCursorState(cursorLocked);	
 			}
-			else {Debug.Log("Couldn't Change To Roam Input");}
 		}
-
-		
 
 		private void SwitchToUIInput()
 		{
@@ -193,10 +227,7 @@ public class StarterAssetsInputs : MonoBehaviour
 				currentInputMap = InputMaps.UI;
 				cursorLocked = false;
 				SetCursorState(cursorLocked);
-				Debug.Log("Changed Input Map to UI");
-				
 			}
-			else {Debug.Log("Couldn't Change to UI input");}
 		}
 #endregion
 

@@ -120,6 +120,7 @@ using UnityEngine.InputSystem;
         private int _animIDSheat;
         private int _animIDSlash;
         private int _animIDShoot;
+        private int _animIDGuard;
 #endregion
 
 #if ENABLE_INPUT_SYSTEM 
@@ -148,7 +149,7 @@ using UnityEngine.InputSystem;
 
 
 
-    #region Unity Funcs.
+#region Unity Funcs.
     void OnEnable()
     {
         SubscribeEvents();
@@ -210,6 +211,7 @@ using UnityEngine.InputSystem;
         Combat.OnDrawing +=  PlayDrawAnim;
         Combat.OnSlashing += PlaySlashAnim;
         Combat.OnShooting += PlayShootAnim; 
+        Combat.OnGuarding += PlayGuardAnim;
     } 
 
     private void UnsubscribeEvents()
@@ -217,23 +219,30 @@ using UnityEngine.InputSystem;
         Combat.OnDrawing -=  PlayDrawAnim;
         Combat.OnSlashing -= PlaySlashAnim;
         Combat.OnShooting -= PlayShootAnim; 
+        Combat.OnGuarding -= PlayGuardAnim;
     }
 #endregion
 
 
 #region Animation
-        //Assign Hash Maps
+    
+    //Assign Hash Maps
     private void AssignAnimationIDs()
     {
+        // Locomotion
         _animIDRun = Animator.StringToHash("Speed");
         _animIDGrounded = Animator.StringToHash("Grounded");
         _animIDJump = Animator.StringToHash("Jump");
         _animIDFreeFall = Animator.StringToHash("FreeFall");
         _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+        
+        
+        //Combat 
         _animIDWithdraw = Animator.StringToHash("IsWithdrawing");
         _animIDSheat = Animator.StringToHash("IsSheating");
         _animIDSlash = Animator.StringToHash("IsSlashing");
         _animIDShoot = Animator.StringToHash("IsShooting");
+        _animIDGuard = Animator.StringToHash("IsGuarding");
     }
 
     private void PlaySlashAnim()
@@ -262,8 +271,12 @@ using UnityEngine.InputSystem;
         _animator.SetTrigger(_animIDShoot);
     }
 
-   
+    private void PlayGuardAnim(bool isGuarding)
+    {
+        if (_animator.GetBool(_animIDGuard) == isGuarding) return;
 
+        _animator.SetBool(_animIDGuard,isGuarding); 
+    }
 #endregion
 
 
@@ -289,8 +302,6 @@ using UnityEngine.InputSystem;
                 _cinemachineTargetYaw, 0.0f);
         }
 #endregion
-
-
 
 
 #region Ground Check
@@ -459,7 +470,6 @@ using UnityEngine.InputSystem;
             return Mathf.Clamp(lfAngle, lfMin, lfMax);
         }
 
-
 #region Debug Gizmo
         private void OnDrawGizmosSelected()
         {
@@ -475,8 +485,6 @@ using UnityEngine.InputSystem;
                 GroundedRadius);
         }
 #endregion
-
-
 
 #region Sound
         private void OnFootstep(AnimationEvent animationEvent)
@@ -500,7 +508,7 @@ using UnityEngine.InputSystem;
 
             }
         }
-    #endregion
+#endregion
 
 
-    }
+}

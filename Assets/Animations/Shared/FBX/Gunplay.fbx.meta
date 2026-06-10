@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: bdf455e1473b2674bacf95553ed7ec15
+guid: e6082aef520ce7c4db8a02e2524be574
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -31,13 +31,13 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Withdraw
+      name: Gun_mixamo
       takeName: mixamo.com
       internalID: -203655887218126122
       firstFrame: 0
-      lastFrame: 89
+      lastFrame: 64
       wrapMode: 0
-      orientationOffsetY: 0
+      orientationOffsetY: -10
       level: 0
       cycleOffset: 0
       loop: 0
@@ -47,7 +47,7 @@ ModelImporter:
       loopBlendOrientation: 1
       loopBlendPositionY: 1
       loopBlendPositionXZ: 1
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0
       heightFromFeet: 0

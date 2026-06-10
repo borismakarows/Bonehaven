@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a24dc898ad598a94c8edbfb17376747e
+guid: 7a6b75279e4fcc34f8a0fea457fd49d3
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -31,13 +31,13 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Shoot
+      name: Slash_mixamo
       takeName: mixamo.com
       internalID: -203655887218126122
       firstFrame: 0
-      lastFrame: 314
+      lastFrame: 122
       wrapMode: 0
-      orientationOffsetY: -90
+      orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: e6082aef520ce7c4db8a02e2524be574
+guid: b9f16d8f6dae5394482124b03b44dc36
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -31,23 +31,23 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Gun
+      name: Guard_mixamo
       takeName: mixamo.com
       internalID: -203655887218126122
       firstFrame: 0
-      lastFrame: 64
+      lastFrame: 110
       wrapMode: 0
-      orientationOffsetY: -10
+      orientationOffsetY: -15
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 1
       loopBlendPositionY: 1
       loopBlendPositionXZ: 1
-      keepOriginalOrientation: 1
+      keepOriginalOrientation: 0
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0
       heightFromFeet: 0

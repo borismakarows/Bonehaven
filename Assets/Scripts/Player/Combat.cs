@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using NUnit.Framework;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -8,13 +9,15 @@ public class Combat : MonoBehaviour
 #region Conditions
     private bool isEquippedSword;
     private bool isDrawedSword;
-    private bool isEquipPistol;
+    private bool isEquippedPistol;
 #endregion
 
 #region Sword 
     [Header("Sword")]
     [SerializeField] private float attackCoolDown = 0.5f;
     private float lastAttackTime;
+
+    private bool isGuarding;
 #endregion
 
 #region Pistol
@@ -28,13 +31,14 @@ public class Combat : MonoBehaviour
     public static event Action OnSlashing;
     public static event Action<bool> OnDrawing;
     public static event Action<float,float> OnShooting;
+    public static event Action<bool> OnGuarding;
 #endregion
 
 #region Unity Funcs.
     void Start()
     {
         isEquippedSword = true;
-        isEquipPistol = true;
+        isEquippedPistol = true;
     }
 
     void OnEnable()
@@ -54,6 +58,7 @@ public class Combat : MonoBehaviour
         StarterAssetsInputs.OnSlashFired += Slash;
         StarterAssetsInputs.OnWithdrawFired += Draw;
         StarterAssetsInputs.OnShootFired += Shoot;
+        StarterAssetsInputs.OnGuardFired += Guard;
     }
 
     private void UnsubscireEvents()
@@ -61,6 +66,7 @@ public class Combat : MonoBehaviour
         StarterAssetsInputs.OnSlashFired -= Slash;
         StarterAssetsInputs.OnWithdrawFired -= Draw;
         StarterAssetsInputs.OnShootFired -= Shoot;
+        StarterAssetsInputs.OnGuardFired -= Guard;
     }
 #endregion
 
@@ -95,12 +101,22 @@ public class Combat : MonoBehaviour
         }
     }
 
+    //Guard Functionality
+    private void Guard(bool _isGuarding)
+    {
+        if (isDrawedSword)
+        {
+            isGuarding = _isGuarding;
+            OnGuarding?.Invoke(isGuarding);
+        }
+    }
 #endregion
+
 
 #region Pistol
     private void Shoot()
     {
-        if (isEquipPistol)
+        if (isEquippedPistol)
         {
             OnShooting?.Invoke(shootRotationSpeed,RotateDegreeY);
         }
