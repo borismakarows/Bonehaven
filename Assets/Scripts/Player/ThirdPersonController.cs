@@ -105,7 +105,6 @@ using UnityEngine.InputSystem;
 #endregion
 
 #region  Animation IDs
-        
         [Header("Animations IDs")]
         
         //GROUND LOCO AND JUMP
@@ -208,7 +207,7 @@ using UnityEngine.InputSystem;
 #region Event Subscriptions
     private void SubscribeEvents()
     {
-        Combat.OnDrawing +=  PlayDrawAnim;
+        Combat.OnArmed +=  PlayDrawAnim;
         Combat.OnSlashing += PlaySlashAnim;
         Combat.OnShooting += PlayShootAnim; 
         Combat.OnGuarding += PlayGuardAnim;
@@ -216,7 +215,7 @@ using UnityEngine.InputSystem;
 
     private void UnsubscribeEvents()
     {
-        Combat.OnDrawing -=  PlayDrawAnim;
+        Combat.OnArmed -=  PlayDrawAnim;
         Combat.OnSlashing -= PlaySlashAnim;
         Combat.OnShooting -= PlayShootAnim; 
         Combat.OnGuarding -= PlayGuardAnim;
@@ -251,17 +250,16 @@ using UnityEngine.InputSystem;
         _animator.SetTrigger(_animIDSlash);
     }
 
-    private void PlayDrawAnim(bool isWithdrawed)
+    private void PlayDrawAnim(bool isArming)
     {
-        if (isWithdrawed)
+        if (isArming)
         {
-            //play sheating anim
-            _animator.SetTrigger(_animIDSheat);
+            _animator.SetTrigger(_animIDWithdraw);
+            
         }
         else
         {
-            //play withdraw anim
-            _animator.SetTrigger(_animIDWithdraw);
+            _animator.SetTrigger(_animIDSheat);
         }
     }
 

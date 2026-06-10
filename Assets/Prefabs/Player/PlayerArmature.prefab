@@ -210,7 +210,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4567962066640723578
 Transform:
   m_ObjectHideFlags: 0
@@ -1061,6 +1061,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ceed8ad6ba4cdd54d8d183e6eaf0ce3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Combat
+  handSwordObject: {fileID: 714081103768090130}
+  beltSwordObject: {fileID: 4189350431917749202}
   attackCoolDown: 1.2
   shootRotationSpeed: 150
   RotateDegreeY: 805
@@ -3641,13 +3643,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4189350431917749202}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.22438066, y: -0.06527334, z: 0.9586388, w: -0.16249487}
-  m_LocalPosition: {x: -0.145, y: 0.104, z: 0.206}
-  m_LocalScale: {x: 0.86528, y: 0.8652801, z: 0.8652801}
-  m_ConstrainProportionsScale: 0
+  m_LocalRotation: {x: -0.21863101, y: -0.08250914, z: 0.9683659, w: -0.087523095}
+  m_LocalPosition: {x: -0.019998278, y: 0.19290094, z: 0.28227305}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 4016616689600113773}
-  m_LocalEulerAnglesHint: {x: 11.424, y: -24.661, z: -163.264}
+  m_LocalEulerAnglesHint: {x: 11.424, y: -24.661, z: -172.176}
 --- !u!33 &4837890364471017650
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -4795,7 +4797,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8238398098927302657
 Transform:
   m_ObjectHideFlags: 0

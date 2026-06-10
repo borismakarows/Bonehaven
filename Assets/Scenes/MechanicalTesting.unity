@@ -645,64 +645,48 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 714081103768090130, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_Name
+      value: Cutlass_Hand
+      objectReference: {fileID: 0}
+    - target: {fileID: 714081103768090130, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2929932206051079342, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.6
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 2929932206051079342, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.6
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 2929932206051079342, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.6
-      objectReference: {fileID: 0}
-    - target: {fileID: 2929932206051079342, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.019998278
-      objectReference: {fileID: 0}
-    - target: {fileID: 2929932206051079342, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.19290094
-      objectReference: {fileID: 0}
-    - target: {fileID: 2929932206051079342, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.28227305
-      objectReference: {fileID: 0}
-    - target: {fileID: 2929932206051079342, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: -0.087523095
-      objectReference: {fileID: 0}
-    - target: {fileID: 2929932206051079342, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0.21863101
-      objectReference: {fileID: 0}
-    - target: {fileID: 2929932206051079342, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.08250914
-      objectReference: {fileID: 0}
-    - target: {fileID: 2929932206051079342, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0.9683659
-      objectReference: {fileID: 0}
-    - target: {fileID: 2929932206051079342, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -172.176
-      objectReference: {fileID: 0}
-    - target: {fileID: 2929932206051079342, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 3181576692495615709, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: m_Name
       value: PlayerArmature
       objectReference: {fileID: 0}
-    - target: {fileID: 4010931275261125903, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+    - target: {fileID: 4189350431917749202, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_Name
+      value: Cutlass_belt
+      objectReference: {fileID: 0}
+    - target: {fileID: 4189350431917749202, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4567962066640723578, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4567962066640723578, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4567962066640723578, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 8328596594160030762, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: m_LocalPosition.x
@@ -742,10 +726,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8328596594160030762, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8424172273957673717, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
-      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

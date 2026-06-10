@@ -30,6 +30,7 @@ public class StarterAssetsInputs : MonoBehaviour
 		public bool jump;
 		public bool sprint;
 		public bool guard;
+		public bool canJump;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -67,6 +68,8 @@ public class StarterAssetsInputs : MonoBehaviour
 				guardActionRef.action.performed += ctx => HandleGuardInput(ctx);
 				guardActionRef.action.canceled += ctx => HandleGuardInput(ctx);
 			}
+
+			Combat.OnArmed += onarmed => CanJump(!onarmed);
     	}
 
 	    void OnDisable()
@@ -78,12 +81,14 @@ public class StarterAssetsInputs : MonoBehaviour
 
 				guardActionRef.action.Disable();
 			}
+
+			Combat.OnArmed -= onarmed => CanJump(!onarmed);
     	}
 #endregion
 
 #region Input Events
 #if ENABLE_INPUT_SYSTEM
-    public void OnMove(InputValue value)
+    	public void OnMove(InputValue value)
 		{
 			MoveInput(value.Get<Vector2>());
 		}
@@ -98,7 +103,7 @@ public class StarterAssetsInputs : MonoBehaviour
 
 		public void OnJump(InputValue value)
 		{
-			JumpInput(value.isPressed);
+			if (canJump){JumpInput(value.isPressed);}
 		}
 
 		public void OnSprint(InputValue value)
@@ -171,6 +176,11 @@ public class StarterAssetsInputs : MonoBehaviour
 			if (guard == newGuardState) return;
 			guard = newGuardState;
 			OnGuardFired?.Invoke(guard);
+		}
+
+		private void CanJump(bool newCanJumpState)
+		{
+			canJump = newCanJumpState;
 		}
 
 #endregion

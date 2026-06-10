@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq.Expressions;
 using NUnit.Framework;
 using Unity.VisualScripting;
@@ -8,15 +9,16 @@ public class Combat : MonoBehaviour
 {
 #region Conditions
     private bool isEquippedSword;
-    private bool isDrawedSword;
+    private bool isArmed;
     private bool isEquippedPistol;
 #endregion
 
 #region Sword 
     [Header("Sword")]
+    [SerializeField] GameObject handSwordObject;
+    [SerializeField] GameObject beltSwordObject;
     [SerializeField] private float attackCoolDown = 0.5f;
     private float lastAttackTime;
-
     private bool isGuarding;
 #endregion
 
@@ -29,7 +31,7 @@ public class Combat : MonoBehaviour
 
 #region  Events
     public static event Action OnSlashing;
-    public static event Action<bool> OnDrawing;
+    public static event Action<bool> OnArmed;
     public static event Action<float,float> OnShooting;
     public static event Action<bool> OnGuarding;
 #endregion
@@ -78,7 +80,7 @@ public class Combat : MonoBehaviour
 
     private bool CheckSwordConditions()
     {
-        if (isEquippedSword && !isDrawedSword) {Draw(); return false;}
+        if (isEquippedSword && !isArmed) {Draw(); return false;}
         else if (!isEquippedSword) {return false;}
         else
         {
@@ -96,15 +98,16 @@ public class Combat : MonoBehaviour
     {
         if (isEquippedSword) 
         {
-            OnDrawing?.Invoke(isDrawedSword);
-            isDrawedSword = !isDrawedSword;
+            isArmed = !isArmed;
+            OnArmed?.Invoke(isArmed);
         }
     }
+
 
     //Guard Functionality
     private void Guard(bool _isGuarding)
     {
-        if (isDrawedSword)
+        if (isArmed)
         {
             isGuarding = _isGuarding;
             OnGuarding?.Invoke(isGuarding);
@@ -122,6 +125,7 @@ public class Combat : MonoBehaviour
         }
     }
 #endregion
+
 
 
 }
