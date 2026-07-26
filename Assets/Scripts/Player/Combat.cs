@@ -1,8 +1,4 @@
 using System;
-using System.Collections;
-using System.Linq.Expressions;
-using NUnit.Framework;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Combat : MonoBehaviour
@@ -15,8 +11,6 @@ public class Combat : MonoBehaviour
 
 #region Sword 
     [Header("Sword")]
-    [SerializeField] GameObject handSwordObject;
-    [SerializeField] GameObject beltSwordObject;
     [SerializeField] private float attackCoolDown = 0.5f;
     private float lastAttackTime;
     private bool isGuarding;
@@ -57,18 +51,18 @@ public class Combat : MonoBehaviour
 #region Event Subs.
     private void SubscribeEvents()
     {
-        StarterAssetsInputs.OnSlashFired += Slash;
-        StarterAssetsInputs.OnWithdrawFired += Draw;
-        StarterAssetsInputs.OnShootFired += Shoot;
-        StarterAssetsInputs.OnGuardFired += Guard;
+        PlayerInputManager.OnSlashFired += Slash;
+        PlayerInputManager.OnWithdrawFired += Draw;
+        PlayerInputManager.OnShootFired += Shoot;
+        PlayerInputManager.OnGuardFired += Guard;
     }
 
     private void UnsubscireEvents()
     {
-        StarterAssetsInputs.OnSlashFired -= Slash;
-        StarterAssetsInputs.OnWithdrawFired -= Draw;
-        StarterAssetsInputs.OnShootFired -= Shoot;
-        StarterAssetsInputs.OnGuardFired -= Guard;
+        PlayerInputManager.OnSlashFired -= Slash;
+        PlayerInputManager.OnWithdrawFired -= Draw;
+        PlayerInputManager.OnShootFired -= Shoot;
+        PlayerInputManager.OnGuardFired -= Guard;
     }
 #endregion
 

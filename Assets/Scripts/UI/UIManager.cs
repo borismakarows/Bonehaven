@@ -15,12 +15,12 @@ public class UIManager : MonoBehaviour
 
     void OnEnable()
     {
-        StarterAssetsInputs.OnInventoryInterfaceOpened += ToggleInventoryUI;
+        PlayerInputManager.OnInventoryInterfaceOpened += ToggleInventoryUI;
     }
 
     void OnDisable()
     {
-        StarterAssetsInputs.OnInventoryInterfaceOpened -= ToggleInventoryUI;
+        PlayerInputManager.OnInventoryInterfaceOpened -= ToggleInventoryUI;
     }
 
     private void ToggleInventoryUI()

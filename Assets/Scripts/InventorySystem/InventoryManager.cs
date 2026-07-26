@@ -11,12 +11,12 @@ public class InventoryManager : MonoBehaviour
 
     void OnEnable()
     {
-        StarterAssetsInputs.OnInventoryInterfaceOpened += LoadInventory;
+        PlayerInputManager.OnInventoryInterfaceOpened += LoadInventory;
     }
 
     void OnDisable()
     {
-        StarterAssetsInputs.OnInventoryInterfaceOpened -= LoadInventory;
+        PlayerInputManager.OnInventoryInterfaceOpened -= LoadInventory;
     }
 
     //Loads the saved Inventory
