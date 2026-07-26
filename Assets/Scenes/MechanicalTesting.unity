@@ -668,6 +668,50 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerArmature
       objectReference: {fileID: 0}
+    - target: {fileID: 4016493853695490415, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.1618
+      objectReference: {fileID: 0}
+    - target: {fileID: 4016493853695490415, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0906
+      objectReference: {fileID: 0}
+    - target: {fileID: 4016493853695490415, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.1219
+      objectReference: {fileID: 0}
+    - target: {fileID: 4016547948824749753, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.1441
+      objectReference: {fileID: 0}
+    - target: {fileID: 4016547948824749753, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.0825
+      objectReference: {fileID: 0}
+    - target: {fileID: 4016547948824749753, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.1427
+      objectReference: {fileID: 0}
+    - target: {fileID: 4016547948824749753, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.69661885
+      objectReference: {fileID: 0}
+    - target: {fileID: 4016547948824749753, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.44707942
+      objectReference: {fileID: 0}
+    - target: {fileID: 4016547948824749753, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.53368944
+      objectReference: {fileID: 0}
+    - target: {fileID: 4016547948824749753, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.17325659
+      objectReference: {fileID: 0}
+    - target: {fileID: 4016547948824749753, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -23.583
+      objectReference: {fileID: 0}
     - target: {fileID: 4189350431917749202, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: m_Name
       value: Cutlass_belt

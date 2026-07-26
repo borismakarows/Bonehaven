@@ -35,30 +35,8 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    //Removes the Last Item
-    public void RemoveLastItem()
+   private void AddItem(Item newItem)
     {
-        int lastIndex = inventory.items.Count - 1;
-        if (lastIndex<0) return;
-        Item  temp = inventory.items[^1];
-        OnInventoryChanged?.Invoke();
-        inventory.items.RemoveAt(lastIndex);
-    }
-
-    public void RemoveFirstItem()
-    {
-        if(inventory.items.Count == 0) return;
-        Item temp = inventory.items[0];
-        OnInventoryChanged?.Invoke();
-        inventory.items.RemoveAt(0);
-    }
-
-    public void CleanInventory()
-    {
-        int Count = inventory.items.Count;
-        while(Count>0)
-        {
-            RemoveLastItem();
-        }
+        
     }
 }

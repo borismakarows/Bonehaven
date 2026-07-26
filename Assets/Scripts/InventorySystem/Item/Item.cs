@@ -27,6 +27,16 @@ public abstract class Item : ScriptableObject
             id = System.Guid.NewGuid().ToString();
         }
     }
+
+    public string GetId()
+    {
+        return id;
+    }
+
+    public ItemTypes GetItemType()
+    {
+        return Type;
+    }
 }
 
 
