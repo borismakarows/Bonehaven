@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
 #endif
 
-/* Note: animations are called via the controller for both the character and capsule using animator null checks
- */
+
 
     [RequireComponent(typeof(CharacterController))]
 #if ENABLE_INPUT_SYSTEM 
     [RequireComponent(typeof(PlayerInput))]
 #endif
-    public class ThirdPersonController : MonoBehaviour
+    public class PlayerController : MonoBehaviour
     {
 #region Move
         [Header("Move")]
@@ -28,16 +27,6 @@ using UnityEngine.InputSystem;
 
         [Tooltip("Acceleration and deceleration")]
         public float SpeedChangeRate = 10.0f;
-#endregion
-
-#region Audio
-        [Header("Audio")]
-        public AudioSource AudioFootsteps;
-        public AudioSource LandingAudio;
-        public AudioSource AudioFoley;
-        public AudioClip LandingAudioClip;
-        public AudioClip[] FootstepAudioClips;
-        [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
 #endregion
 
 #region Jump
@@ -104,35 +93,19 @@ using UnityEngine.InputSystem;
         private float _fallTimeoutDelta;
 #endregion
 
-#region  Animation IDs
-        [Header("Animations IDs")]
-        
-        //GROUND LOCO AND JUMP
-        private int _animIDGrounded;
-         private int _animIDMotionSpeed;
-         private int _animIDRun;
-        private int _animIDJump;
-        private int _animIDFreeFall;
-       
-       // COMBAT
-        private int _animIDWithdraw;
-        private int _animIDSheat;
-        private int _animIDSlash;
-        private int _animIDShoot;
-        private int _animIDGuard;
-#endregion
+
 
 #if ENABLE_INPUT_SYSTEM 
+        [Header("Components")]
         private PlayerInput _playerInput;
 #endif
-        private Animator _animator;
         private CharacterController _controller;
-        private StarterAssetsInputs _input;
+        private PlayerInputManager _input;
         private GameObject _mainCamera;
+        private AnimationController animationController;
 
         private const float _threshold = 0.01f;
 
-        private bool _hasAnimator;
 
         private bool IsCurrentDeviceMouse
         {
@@ -146,20 +119,14 @@ using UnityEngine.InputSystem;
             }
         }
 
+        public static event Action<bool> OnGrounded;
+        public static event Action<float,float> OnRun;
+        public static event Action OnJump;
+        public static event Action OnFreeFall;
+
 
 
 #region Unity Funcs.
-    void OnEnable()
-    {
-        SubscribeEvents();
-    }
-
-    void OnDisable()
-    {
-        UnsubscribeEvents();
-    }
-
-
     private void Awake()
         {
             // get a reference to our main camera
@@ -171,27 +138,31 @@ using UnityEngine.InputSystem;
 
         private void Start()
         {
-            _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
+            AssignComponents();
+            DefaultSettings();   
+        }
 
-            _hasAnimator = TryGetComponent(out _animator);
+        private void AssignComponents()
+        {
             _controller = GetComponent<CharacterController>();
-            _input = GetComponent<StarterAssetsInputs>();
+            _input = GetComponent<PlayerInputManager>();
+            animationController = GetComponent<AnimationController>();
 #if ENABLE_INPUT_SYSTEM 
             _playerInput = GetComponent<PlayerInput>();
 #else
 			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
 #endif
-            AssignAnimationIDs();
+        }
 
-            // reset our timeouts on start
+        private void DefaultSettings()
+        {
+            _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
         }
 
         private void Update()
         {
-            _hasAnimator = TryGetComponent(out _animator);
-
             JumpAndGravity();
             GroundedCheck();
             Move();
@@ -201,80 +172,6 @@ using UnityEngine.InputSystem;
         {
             CameraRotation();
         }
-#endregion
-
-
-#region Event Subscriptions
-    private void SubscribeEvents()
-    {
-        Combat.OnArmed +=  PlayDrawAnim;
-        Combat.OnSlashing += PlaySlashAnim;
-        Combat.OnShooting += PlayShootAnim; 
-        Combat.OnGuarding += PlayGuardAnim;
-    } 
-
-    private void UnsubscribeEvents()
-    {
-        Combat.OnArmed -=  PlayDrawAnim;
-        Combat.OnSlashing -= PlaySlashAnim;
-        Combat.OnShooting -= PlayShootAnim; 
-        Combat.OnGuarding -= PlayGuardAnim;
-    }
-#endregion
-
-
-#region Animation
-    
-    //Assign Hash Maps
-    private void AssignAnimationIDs()
-    {
-        // Locomotion
-        _animIDRun = Animator.StringToHash("Speed");
-        _animIDGrounded = Animator.StringToHash("Grounded");
-        _animIDJump = Animator.StringToHash("Jump");
-        _animIDFreeFall = Animator.StringToHash("FreeFall");
-        _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
-        
-        
-        //Combat 
-        _animIDWithdraw = Animator.StringToHash("IsWithdrawing");
-        _animIDSheat = Animator.StringToHash("IsSheating");
-        _animIDSlash = Animator.StringToHash("IsSlashing");
-        _animIDShoot = Animator.StringToHash("IsShooting");
-        _animIDGuard = Animator.StringToHash("IsGuarding");
-    }
-
-    private void PlaySlashAnim()
-    {
-        _animator.ResetTrigger(_animIDSlash);
-        _animator.SetTrigger(_animIDSlash);
-    }
-
-    private void PlayDrawAnim(bool isArming)
-    {
-        if (isArming)
-        {
-            _animator.SetTrigger(_animIDWithdraw);
-            
-        }
-        else
-        {
-            _animator.SetTrigger(_animIDSheat);
-        }
-    }
-
-    private void PlayShootAnim(float _shootRotationSpeed, float _rotationDegreeY)
-    {   
-        _animator.ResetTrigger(_animIDShoot);
-        _animator.SetTrigger(_animIDShoot);
-    }
-
-    private void PlayGuardAnim(bool isGuarding)
-    {
-        if (_animator.GetBool(_animIDGuard) == isGuarding) return;
-
-        _animator.SetBool(_animIDGuard,isGuarding); 
-    }
 #endregion
 
 
@@ -305,17 +202,13 @@ using UnityEngine.InputSystem;
 #region Ground Check
         private void GroundedCheck()
         {
-            // set sphere position, with offset
             Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset,
                 transform.position.z);
             Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers,
                 QueryTriggerInteraction.Ignore);
-
-            // update animator if using character
-            if (_hasAnimator)
-            {
-                _animator.SetBool(_animIDGrounded, Grounded);
-            }
+            
+            OnGrounded?.Invoke(Grounded);
+            
         }
 #endregion
 
@@ -381,12 +274,8 @@ using UnityEngine.InputSystem;
             _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
                              new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 
-            // update animator if using character
-            if (_hasAnimator)
-            {
-                _animator.SetFloat(_animIDRun, _animationBlend);
-                _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
-            }
+            // invoke Animator
+            OnRun?.Invoke(_animationBlend,inputMagnitude);
         }
 #endregion
 
@@ -397,13 +286,7 @@ using UnityEngine.InputSystem;
             {
                 // reset the fall timeout timer
                 _fallTimeoutDelta = FallTimeout;
-
-                // update animator if using character
-                if (_hasAnimator)
-                {
-                    _animator.SetBool(_animIDJump, false);
-                    _animator.SetBool(_animIDFreeFall, false);
-                }
+                animationController.ResetJump();
 
                 // stop our velocity dropping infinitely when grounded
                 if (_verticalVelocity < 0.0f)
@@ -418,10 +301,7 @@ using UnityEngine.InputSystem;
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 
                     // update animator if using character
-                    if (_hasAnimator)
-                    {
-                        _animator.SetBool(_animIDJump, true);
-                    }
+                    OnJump?.Invoke();
                 }
 
                 // jump timeout
@@ -442,11 +322,7 @@ using UnityEngine.InputSystem;
                 }
                 else
                 {
-                    // update animator if using character
-                    if (_hasAnimator)
-                    {
-                        _animator.SetBool(_animIDFreeFall, true);
-                    }
+                    OnFreeFall?.Invoke();
                 }
 
                 // if we are not grounded, do not jump
@@ -481,30 +357,6 @@ using UnityEngine.InputSystem;
             Gizmos.DrawSphere(
                 new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z),
                 GroundedRadius);
-        }
-#endregion
-
-#region Sound
-        private void OnFootstep(AnimationEvent animationEvent)
-        {
-            if (animationEvent.animatorClipInfo.weight > 0.5f)
-            {
-
-                if (AudioFootsteps != null)
-                    AudioFootsteps.Play();
-                if (AudioFoley != null)
-                    AudioFoley.Play();
-            }
-        }
-
-        private void OnLand(AnimationEvent animationEvent)
-        {
-            if (animationEvent.animatorClipInfo.weight > 0.5f)
-            {
-                if (LandingAudio != null)
-                    LandingAudio.Play();
-
-            }
         }
 #endregion
 

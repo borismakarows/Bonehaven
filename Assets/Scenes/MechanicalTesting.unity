@@ -574,6 +574,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63b9473038445c94691922b05cefb311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryUI
+--- !u!1 &1116971554
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1116971555}
+  m_Layer: 0
+  m_Name: CheckPoints
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1116971555
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1116971554}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1248837216 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4016596865487770385, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+  m_PrefabInstance: {fileID: 1490415431}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1273854738
 GameObject:
   m_ObjectHideFlags: 0
@@ -584,7 +620,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1273854739}
   m_Layer: 0
-  m_Name: Checkpoint
+  m_Name: Checkpoint00
   m_TagString: Checkpoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -615,7 +651,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1389554799}
   m_Layer: 0
-  m_Name: Checkpoint (1)
+  m_Name: Checkpoint01
   m_TagString: Checkpoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -652,6 +688,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2539626313604441708, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: handSwordObject
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2929932206051079342, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.7
@@ -666,7 +706,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3181576692495615709, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: m_Name
-      value: PlayerArmature
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 4016493853695490415, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: m_LocalPosition.x
@@ -732,6 +772,18 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 0.7
       objectReference: {fileID: 0}
+    - target: {fileID: 4567962066640723578, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4567962066640723578, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4567962066640723578, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8328596594160030762, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 228.5009
@@ -773,8 +825,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 714081103768090130, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+    - {fileID: 4189350431917749202, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 4016596865487770385, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2065844943}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
 --- !u!4 &1490415433 stripped
@@ -853,7 +910,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1725189761}
   m_Layer: 0
-  m_Name: Checkpoint (3)
+  m_Name: Checkpoint03
   m_TagString: Checkpoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -963,6 +1020,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
+--- !u!1 &2065844942
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2065844943}
+  m_Layer: 0
+  m_Name: Slot_SwordActive
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2065844943
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2065844942}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1248837216}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2091790198
 GameObject:
   m_ObjectHideFlags: 0
@@ -973,7 +1061,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2091790199}
   m_Layer: 0
-  m_Name: Checkpoint (2)
+  m_Name: Checkpoint02
   m_TagString: Checkpoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1011,3 +1099,4 @@ SceneRoots:
   - {fileID: 2091790199}
   - {fileID: 1389554799}
   - {fileID: 1725189761}
+  - {fileID: 1116971555}

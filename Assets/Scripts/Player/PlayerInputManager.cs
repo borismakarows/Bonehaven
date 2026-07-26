@@ -1,10 +1,7 @@
 using System;
-using System.Collections;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering;
 #endif
 
 public enum InputMaps
@@ -14,7 +11,7 @@ public enum InputMaps
 }
 
 [RequireComponent(typeof(PlayerInput))]
-public class StarterAssetsInputs : MonoBehaviour
+public class PlayerInputManager : MonoBehaviour
 {
 		[Header("Inputs")]
 		[SerializeField] private PlayerInput playerInput;
@@ -46,6 +43,8 @@ public class StarterAssetsInputs : MonoBehaviour
 		public static event Action OnShootFired;
 		public static event Action<bool> OnGuardFired;
 #endregion
+
+
 
 #region Unity Funcs.
         void OnValidate()
@@ -175,7 +174,6 @@ public class StarterAssetsInputs : MonoBehaviour
 		{
 			if (guard == newGuardState) return;
 			guard = newGuardState;
-			OnGuardFired?.Invoke(guard);
 		}
 
 		private void CanJump(bool newCanJumpState)
