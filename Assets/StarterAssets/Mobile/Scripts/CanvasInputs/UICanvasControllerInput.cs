@@ -1,30 +1,28 @@
 using UnityEngine;
 
-    public class UICanvasControllerInput : MonoBehaviour
-    {
 
-        [Header("Output")]
-        public PlayerInputManager playerInputManager;
-
-        public void VirtualMoveInput(Vector2 virtualMoveDirection)
+namespace BoneHaven
+{
+       public class UICanvasControllerInput : MonoBehaviour
         {
-            playerInputManager.MoveInput(virtualMoveDirection);
-        }
 
-        public void VirtualLookInput(Vector2 virtualLookDirection)
-        {
-            playerInputManager.LookInput(virtualLookDirection);
-        }
+            [Header("Output")]
+            public PlayerInputManager playerInputManager;
 
-        public void VirtualJumpInput(bool virtualJumpState)
-        {
-            playerInputManager.JumpInput(virtualJumpState);
-        }
+            public void VirtualMoveInput(Vector2 virtualMoveDirection)
+            {
+                playerInputManager.MoveInput(virtualMoveDirection);
+            }
 
-        public void VirtualSprintInput(bool virtualSprintState)
-        {
-            playerInputManager.SprintInput(virtualSprintState);
-        }
-        
+            public void VirtualLookInput(Vector2 virtualLookDirection)
+            {
+                playerInputManager.LookInput(virtualLookDirection);
+            }
 
+            public void VirtualSprintInput(bool virtualSprintState)
+            {
+                playerInputManager.SprintInput(virtualSprintState);
+            }
+        } 
 }
+

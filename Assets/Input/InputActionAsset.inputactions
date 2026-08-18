@@ -25,15 +25,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Jump",
-                    "type": "Button",
-                    "id": "8c4abdf8-4099-493a-aa1a-129acec7c3df",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Sprint",
                     "type": "PassThrough",
                     "id": "980e881e-182c-404c-8cbf-3d09fdb48fef",
@@ -61,15 +52,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Draw",
-                    "type": "Button",
-                    "id": "7e40e4bf-ef34-4c8c-a61c-b89ad0618da1",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Shoot",
                     "type": "Button",
                     "id": "8db11c20-d669-4fa9-a463-15dc8f8d6be0",
@@ -79,9 +61,18 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Guard",
+                    "name": "Dash",
                     "type": "Button",
-                    "id": "ca2844f6-add8-4549-8651-ec72b879ac10",
+                    "id": "2c3ec510-123a-4905-a2e7-c294a2dce8c0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Pocket Powder",
+                    "type": "Button",
+                    "id": "2f7e0f8c-a076-4857-8505-7cc766dc1a7d",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -223,44 +214,11 @@
                 },
                 {
                     "name": "",
-                    "id": "1bd55a0b-761e-4ae4-89ae-8ec127e08a29",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "KeyboardMouse",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "9f973413-5e27-4239-acee-38c4a63feeba",
-                    "path": "<Gamepad>/buttonSouth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "dc65b89f-9bd3-43fb-92af-d0d87ba5faa4",
                     "path": "<Keyboard>/leftShift",
                     "interactions": "",
                     "processors": "",
                     "groups": "KeyboardMouse",
-                    "action": "Sprint",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "c8fcd86e-dcfd-4f88-8e93-b638cdbf3320",
-                    "path": "<Gamepad>/leftTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
                     "action": "Sprint",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -289,34 +247,34 @@
                 },
                 {
                     "name": "",
-                    "id": "650223ca-b320-4362-9add-6dc9fa677bb9",
-                    "path": "<Keyboard>/1",
+                    "id": "977dd354-71ba-4c45-bfac-c0e7b4e3f826",
+                    "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
                     "groups": ";KeyboardMouse",
-                    "action": "Draw",
+                    "action": "Dash",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "a2fb9c8c-e72f-49b1-9b78-68e49f59e82f",
-                    "path": "<Mouse>/middleButton",
+                    "id": "4c27c5a2-572f-423a-9cd7-a532ff29696a",
+                    "path": "<Keyboard>/q",
                     "interactions": "",
                     "processors": "",
                     "groups": ";KeyboardMouse",
-                    "action": "Shoot",
+                    "action": "Pocket Powder",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "5c7533d8-1323-4a0e-be9e-ff19f896f6d8",
+                    "id": "db0edbac-df85-4e2f-8069-63011ffa98b0",
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";KeyboardMouse",
-                    "action": "Guard",
+                    "groups": "",
+                    "action": "Shoot",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

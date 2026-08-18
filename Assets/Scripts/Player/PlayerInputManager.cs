@@ -10,12 +10,13 @@ public enum InputMaps
 	UI
 }
 
-[RequireComponent(typeof(PlayerInput))]
-public class PlayerInputManager : MonoBehaviour
+namespace BoneHaven
 {
+	[RequireComponent(typeof(PlayerInput))]
+	public class PlayerInputManager : MonoBehaviour
+	{
 		[Header("Inputs")]
 		[SerializeField] private PlayerInput playerInput;
-		[SerializeField] private InputActionReference guardActionRef;
 		private const string roamMapName = "Roam";
 		private const string UIMapName = "UI";
 		private InputMaps previousInputMap;
@@ -24,10 +25,7 @@ public class PlayerInputManager : MonoBehaviour
 		[Header("Character Input Values")]
 		public Vector2 move;
 		public Vector2 look;
-		public bool jump;
 		public bool sprint;
-		public bool guard;
-		public bool canJump;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -35,59 +33,32 @@ public class PlayerInputManager : MonoBehaviour
 		[Header("Mouse Cursor Settings")]
 		public bool cursorLocked = true;
 		public bool cursorInputForLook = true;
-		
+			
 #region Events
 		public static event Action OnInventoryInterfaceOpened;
 		public static event Action OnSlashFired;
 		public static event Action OnWithdrawFired;
 		public static event Action OnShootFired;
-		public static event Action<bool> OnGuardFired;
 #endregion
 
 
 
 #region Unity Funcs.
-        void OnValidate()
-        {
-            if (playerInput == null) {playerInput = GetComponent<PlayerInput>();}
-        }
+		void OnValidate()
+		{
+			if (playerInput == null) {playerInput = GetComponent<PlayerInput>();}
+		}
 
-        void Awake()
-        {
-            if (playerInput == null) {playerInput = GetComponent<PlayerInput>();}
+		void Awake()
+		{
+			if (playerInput == null) {playerInput = GetComponent<PlayerInput>();}
 			playerInput.defaultActionMap = roamMapName;
-        }
-
-	    void OnEnable()
-    	{
-			if (guardActionRef != null && guardActionRef.action != null)
-			{
-				guardActionRef.action.Enable();
-
-				guardActionRef.action.performed += ctx => HandleGuardInput(ctx);
-				guardActionRef.action.canceled += ctx => HandleGuardInput(ctx);
-			}
-
-			Combat.OnArmed += onarmed => CanJump(!onarmed);
-    	}
-
-	    void OnDisable()
-    	{
-			if (guardActionRef != null && guardActionRef.action != null)
-			{
-				guardActionRef.action.performed -= ctx => HandleGuardInput(ctx);
-				guardActionRef.action.canceled -= ctx => HandleGuardInput(ctx);
-
-				guardActionRef.action.Disable();
-			}
-
-			Combat.OnArmed -= onarmed => CanJump(!onarmed);
-    	}
+		}
 #endregion
 
 #region Input Events
 #if ENABLE_INPUT_SYSTEM
-    	public void OnMove(InputValue value)
+		public void OnMove(InputValue value)
 		{
 			MoveInput(value.Get<Vector2>());
 		}
@@ -96,13 +67,8 @@ public class PlayerInputManager : MonoBehaviour
 		{
 			if(cursorInputForLook)
 			{
-				LookInput(value.Get<Vector2>());
+					LookInput(value.Get<Vector2>());
 			}
-		}
-
-		public void OnJump(InputValue value)
-		{
-			if (canJump){JumpInput(value.isPressed);}
 		}
 
 		public void OnSprint(InputValue value)
@@ -132,7 +98,7 @@ public class PlayerInputManager : MonoBehaviour
 		public void OnSlash(InputValue value)
 		{
 			if (!value.isPressed) return;
-			
+				
 			OnSlashFired?.Invoke();
 		}
 
@@ -140,11 +106,6 @@ public class PlayerInputManager : MonoBehaviour
 		{
 			if (!value.isPressed) return;
 			OnShootFired?.Invoke();
-		}
-
-		private void HandleGuardInput(InputAction.CallbackContext context)
-		{
-			GuardInput(context.ReadValueAsButton());
 		}
 #endif
 #endregion
@@ -160,27 +121,10 @@ public class PlayerInputManager : MonoBehaviour
 			look = newLookDirection;
 		}
 
-		public void JumpInput(bool newJumpState)
-		{
-			jump = newJumpState;
-		}
-
 		public void SprintInput(bool newSprintState)
 		{
 			sprint = newSprintState;
 		}
-
-		public void GuardInput(bool newGuardState)
-		{
-			if (guard == newGuardState) return;
-			guard = newGuardState;
-		}
-
-		private void CanJump(bool newCanJumpState)
-		{
-			canJump = newCanJumpState;
-		}
-
 #endregion
 
 #region Cursor Functions
@@ -198,7 +142,7 @@ public class PlayerInputManager : MonoBehaviour
 #region Input Map 
 
 		public InputMaps GetCurrentInputMap() {return currentInputMap;}
-		
+			
 		public void SwitchInputMap(InputMaps _InputMap)
 		{
 			switch (_InputMap)
@@ -215,7 +159,7 @@ public class PlayerInputManager : MonoBehaviour
 				break;
 			}
 		}
-		
+			
 		private void SwitchToRoamInput()
 		{
 			if(playerInput.actions.FindActionMap(roamMapName) != null) 
@@ -238,6 +182,7 @@ public class PlayerInputManager : MonoBehaviour
 			}
 		}
 #endregion
-
+	}
 }
+
 	
