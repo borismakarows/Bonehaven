@@ -70,7 +70,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Pocket Powder",
+                    "name": "Powder",
                     "type": "Button",
                     "id": "2f7e0f8c-a076-4857-8505-7cc766dc1a7d",
                     "expectedControlType": "",
@@ -263,7 +263,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";KeyboardMouse",
-                    "action": "Pocket Powder",
+                    "action": "Powder",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

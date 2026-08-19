@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "A Pirate Odyssey.slnx"
+    "dotnet.defaultSolution": "Bonehaven.slnx"
 }

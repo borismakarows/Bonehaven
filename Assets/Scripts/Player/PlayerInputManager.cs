@@ -26,6 +26,10 @@ namespace BoneHaven
 		public Vector2 move;
 		public Vector2 look;
 		public bool sprint;
+		public bool slash;
+		public bool powder;
+		public bool shoot;
+		public bool dash;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -33,14 +37,9 @@ namespace BoneHaven
 		[Header("Mouse Cursor Settings")]
 		public bool cursorLocked = true;
 		public bool cursorInputForLook = true;
-			
-#region Events
+		
+		//Events
 		public static event Action OnInventoryInterfaceOpened;
-		public static event Action OnSlashFired;
-		public static event Action OnWithdrawFired;
-		public static event Action OnShootFired;
-#endregion
-
 
 
 #region Unity Funcs.
@@ -56,25 +55,20 @@ namespace BoneHaven
 		}
 #endregion
 
-#region Input Events
 #if ENABLE_INPUT_SYSTEM
-		public void OnMove(InputValue value)
-		{
-			MoveInput(value.Get<Vector2>());
-		}
 
-		public void OnLook(InputValue value)
+#region Input Callbacks
+		public void OnMove(InputValue value) => MoveInput(value.Get<Vector2>());
+
+		public void OnLook(InputValue value) 
 		{
 			if(cursorInputForLook)
 			{
-					LookInput(value.Get<Vector2>());
+				LookInput(value.Get<Vector2>());
 			}
 		}
 
-		public void OnSprint(InputValue value)
-		{
-			SprintInput(value.isPressed);
-		}
+		public void OnSprint(InputValue value) => SprintInput(value.isPressed);
 
 		public void OnInventory(InputValue value)
 		{
@@ -89,58 +83,29 @@ namespace BoneHaven
 				OnInventoryInterfaceOpened?.Invoke();
 			}
 		}
-
-		public void OnDraw(InputValue value)
-		{
-			if (value.isPressed) {OnWithdrawFired?.Invoke();}
-		}
-
-		public void OnSlash(InputValue value)
-		{
-			if (!value.isPressed) return;
-				
-			OnSlashFired?.Invoke();
-		}
-
-		public void OnShoot(InputValue value)
-		{
-			if (!value.isPressed) return;
-			OnShootFired?.Invoke();
-		}
+		public void OnSlash(InputValue value) => SlashInput(value.isPressed);
+		public void OnShoot(InputValue value) => ShootInput(value.isPressed);
+		public void OnDash(InputValue value) => DashInput(value.isPressed);
+		public void OnPowder(InputValue value) => PowderInput(value.isPressed);
+#endregion
 #endif
+
+#region Value Setters
+		public void MoveInput(Vector2 newMoveDirection) => move = newMoveDirection;
+		public void LookInput(Vector2 newLookDirection) => look = newLookDirection;
+		public void SprintInput(bool newSprintState) => sprint = newSprintState;
+		public void SlashInput(bool newSlashState) => slash = newSlashState;
+		public void ShootInput(bool newShootState) => shoot = newShootState;
+		public void DashInput(bool newDashState) => dash = newDashState;
+		public void PowderInput(bool newPowderState) => powder = newPowderState;
 #endregion
 
-#region Input Values
-		public void MoveInput(Vector2 newMoveDirection)
-		{
-			move = newMoveDirection;
-		} 
-
-		public void LookInput(Vector2 newLookDirection)
-		{
-			look = newLookDirection;
-		}
-
-		public void SprintInput(bool newSprintState)
-		{
-			sprint = newSprintState;
-		}
+#region Cursor Management
+		private void OnApplicationFocus(bool hasFocus) => SetCursorState(cursorLocked);
+		private void SetCursorState(bool newState) => Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
 #endregion
 
-#region Cursor Functions
-		private void OnApplicationFocus(bool hasFocus)
-		{
-			SetCursorState(cursorLocked);
-		}
-
-		private void SetCursorState(bool newState)
-		{
-			Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
-		}
-#endregion
-
-#region Input Map 
-
+#region Input Mapping
 		public InputMaps GetCurrentInputMap() {return currentInputMap;}
 			
 		public void SwitchInputMap(InputMaps _InputMap)
