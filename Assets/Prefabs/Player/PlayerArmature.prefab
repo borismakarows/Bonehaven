@@ -820,7 +820,7 @@ GameObject:
   - component: {fileID: 3617531292775697289}
   - component: {fileID: 7011447443997280696}
   - component: {fileID: 7274578692666738596}
-  - component: {fileID: 7094591328485092761}
+  - component: {fileID: 5500498472166590335}
   m_Layer: 8
   m_Name: PlayerArmature
   m_TagString: Player
@@ -1003,6 +1003,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87bfab84f174e054fabe2b0d7f0f9f95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoneHaven.PlayerAnimationController
+  locomotion: {fileID: 0}
   combatFSM: {fileID: 0}
 --- !u!114 &1015585283773811495
 MonoBehaviour:
@@ -1051,15 +1052,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26e54e5a728a9234ab24fcf1460ed8a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 2
-  SprintSpeed: 5.335
-  RotationSmoothTime: 0.12
-  SpeedChangeRate: 10
-  CinemachineCameraTarget: {fileID: 8666323792065867653}
-  TopClamp: 70
-  BottomClamp: -30
-  CameraAngleOverride: 0
-  LockCameraPosition: 0
+  cinemachineCameraTarget: {fileID: 0}
+  topClamp: 70
+  bottomClamp: -30
+  cameraAngleOverride: 0
+  lockCameraPosition: 0
+  walkSpeed: 1.2
+  runSpeed: 3.8
+  speedChangeRate: 10
+  rotationSmoothTime: 0.12
 --- !u!114 &3617531292775697289
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1118,7 +1119,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BoneHaven.CombatLunge
   strikeDistance: 1.3
   lungeDuration: 0.12
---- !u!114 &7094591328485092761
+--- !u!114 &5500498472166590335
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1127,14 +1128,30 @@ MonoBehaviour:
   m_GameObject: {fileID: 3181576692495615709}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd4500ad3b56e94498cb80ebaf795d7a, type: 3}
+  m_Script: {fileID: 11500000, guid: 653185ae950210d4ea60dcd39917dafc, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BoneHaven.CombatLungeTester
+  m_EditorClassIdentifier: Assembly-CSharp::BoneHaven.PlayerCombatFSM
+  dashSpeed: 10
+  dashDuration: 0.35
+  iFrameDuration: 0.2
+  attack1Duration: 0.45
+  attack2Duration: 0.45
+  attack3Duration: 0.65
+  comboBufferWindow: 0.25
+  slashDamage: 20
+  finisherDamage: 40
+  meleeHitboxRadius: 1.6
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  powderThrowDuration: 0.4
+  executionWindupDuration: 0.35
+  executionRange: 1.8
+  maxGunpowderPouches: 3
+  maxFlintlockAmmo: 4
+  locomotion: {fileID: 0}
   targetLock: {fileID: 0}
   combatLunge: {fileID: 0}
-  cameraTransform: {fileID: 0}
-  moveSpeed: 5
-  rotationSmoothTime: 0.12
 --- !u!1 &3237777468113743914
 GameObject:
   m_ObjectHideFlags: 0

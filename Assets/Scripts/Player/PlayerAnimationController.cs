@@ -5,11 +5,12 @@ namespace BoneHaven
     [RequireComponent(typeof(Animator))]
     public class PlayerAnimationController : MonoBehaviour
     {
-        private PlayerCombatFSM combatFSM;
+        [SerializeField] private PlayerLocomotion locomotion;
+        [SerializeField] private PlayerCombatFSM combatFSM;
         private Animator animator;
 
-        // Animator Parameters
         private static readonly int HashSpeed = Animator.StringToHash("Speed");
+        private static readonly int HashMotionSpeed = Animator.StringToHash("MotionSpeed");
         private static readonly int HashAttack1 = Animator.StringToHash("Attack1");
         private static readonly int HashAttack2 = Animator.StringToHash("Attack2");
         private static readonly int HashAttack3 = Animator.StringToHash("Attack3");
@@ -20,32 +21,38 @@ namespace BoneHaven
         private void Awake()
         {
             animator = GetComponent<Animator>();
-            if (combatFSM == null) combatFSM = GetComponent<PlayerCombatFSM>();
+            if (locomotion == null) locomotion = GetComponentInParent<PlayerLocomotion>();
+            if (combatFSM == null) combatFSM = GetComponentInParent<PlayerCombatFSM>();
         }
 
         private void OnEnable()
         {
-            if (combatFSM == null) return;
-            combatFSM.OnAttackExecuted += PlayAttackAnimation;
-            combatFSM.OnDashExecuted += PlayDashAnimation;
-            combatFSM.OnPowderExecuted += PlayPowderAnimation;
-            combatFSM.OnExecutionTriggered += PlayExecutionAnimation;
-            combatFSM.OnSpeedUpdated += UpdateSpeed;
+            if (locomotion != null) locomotion.OnLocomotionUpdated += UpdateLocomotionAnimation;
+            if (combatFSM != null)
+            {
+                combatFSM.OnAttackExecuted += PlayAttackAnimation;
+                combatFSM.OnDashExecuted += PlayDashAnimation;
+                combatFSM.OnPowderExecuted += PlayPowderAnimation;
+                combatFSM.OnExecutionTriggered += PlayExecutionAnimation;
+            }
         }
 
         private void OnDisable()
         {
-            if (combatFSM == null) return;
-            combatFSM.OnAttackExecuted -= PlayAttackAnimation;
-            combatFSM.OnDashExecuted -= PlayDashAnimation;
-            combatFSM.OnPowderExecuted -= PlayPowderAnimation;
-            combatFSM.OnExecutionTriggered -= PlayExecutionAnimation;
-            combatFSM.OnSpeedUpdated -= UpdateSpeed;
+            if (locomotion != null) locomotion.OnLocomotionUpdated -= UpdateLocomotionAnimation;
+            if (combatFSM != null)
+            {
+                combatFSM.OnAttackExecuted -= PlayAttackAnimation;
+                combatFSM.OnDashExecuted -= PlayDashAnimation;
+                combatFSM.OnPowderExecuted -= PlayPowderAnimation;
+                combatFSM.OnExecutionTriggered -= PlayExecutionAnimation;
+            }
         }
 
-        private void UpdateSpeed(float speed)
+        private void UpdateLocomotionAnimation(float speed, float inputMagnitude)
         {
             animator.SetFloat(HashSpeed, speed);
+            animator.SetFloat(HashMotionSpeed, speed > 0.1f ? 1.0f : 0.0f);
         }
 
         private void PlayAttackAnimation(int comboIndex)

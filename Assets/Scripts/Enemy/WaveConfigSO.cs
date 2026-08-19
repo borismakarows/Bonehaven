@@ -24,6 +24,6 @@ namespace BoneHaven
         public float initialWaveDelay = 2.0f;
 
         [Header("Progression Rewards")]
-        public GameObject keyDropPrefab; // Fortress Gate Key (Wave 1) or Ship Key (Wave 2)
+        public GameObject progressionReward; // Fortress Gate Key (Wave 1) or Ship Key (Wave 2)
     }
 }

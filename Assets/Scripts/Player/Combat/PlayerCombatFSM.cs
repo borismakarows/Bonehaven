@@ -4,31 +4,18 @@ using UnityEngine;
 
 namespace BoneHaven
 {
-    [RequireComponent(typeof(CharacterController))]
     public class PlayerCombatFSM : MonoBehaviour
     {
-        [Header("Required Dependencies")]
-        [SerializeField] private PlayerInputManager inputManager;
-        [SerializeField] private SoftTargetLock targetLock;
-        [SerializeField] private CombatLunge combatLunge;
-        [SerializeField] private Transform cameraTransform;
-
-        [Header("Movement Settings")]
-        [SerializeField] private float moveSpeed = 5.5f;
-        [SerializeField] private float rotationSmoothTime = 0.1f;
-
         [Header("Dash Settings")]
-        [SerializeField] private float dashSpeed = 10f;
+        [SerializeField] private float dashSpeed = 9f;
         [SerializeField] private float dashDuration = 0.35f;
         [SerializeField] private float iFrameDuration = 0.2f;
 
-        [Header("Melee & Combo Timings")]
+        [Header("Melee & Combo Settings")]
         [SerializeField] private float attack1Duration = 0.45f;
         [SerializeField] private float attack2Duration = 0.45f;
         [SerializeField] private float attack3Duration = 0.65f;
         [SerializeField] private float comboBufferWindow = 0.25f;
-
-        [Header("Damage Settings")]
         [SerializeField] private float slashDamage = 20f;
         [SerializeField] private float finisherDamage = 40f;
         [SerializeField] private float meleeHitboxRadius = 1.6f;
@@ -41,52 +28,49 @@ namespace BoneHaven
         [SerializeField] private int maxGunpowderPouches = 3;
         [SerializeField] private int maxFlintlockAmmo = 4;
 
-        // Decoupled Observer Events for Animation & Audio
+        [Header("Dependencies")]
+        private PlayerLocomotion locomotion;
+        private SoftTargetLock targetLock;
+        private CombatLunge combatLunge;
+
         public event Action<int> OnAttackExecuted;
         public event Action OnDashExecuted;
         public event Action OnPowderExecuted;
         public event Action OnExecutionTriggered;
-        public event Action<float> OnSpeedUpdated;
 
-        // Public State Properties
         public PlayerCombatState CurrentState { get; private set; } = PlayerCombatState.FreeMovement;
         public bool IsInvulnerable { get; private set; } = false;
         public int GunpowderCount { get; private set; } = 3;
         public int FlintlockAmmo { get; private set; } = 4;
 
-        private CharacterController controller;
+        private PlayerInputManager inputManager;
         private Coroutine activeActionRoutine;
         private bool attackBuffered = false;
         private bool dashBuffered = false;
-        private float rotationVelocity;
 
         private void Awake()
         {
-            controller = GetComponent<CharacterController>();
-            if (inputManager == null) inputManager = GetComponent<PlayerInputManager>();
+            inputManager = GetComponent<PlayerInputManager>();
+            if (locomotion == null) locomotion = GetComponent<PlayerLocomotion>();
             if (targetLock == null) targetLock = GetComponent<SoftTargetLock>();
             if (combatLunge == null) combatLunge = GetComponent<CombatLunge>();
-
-            if (cameraTransform == null && Camera.main != null)
-                cameraTransform = Camera.main.transform;
         }
 
         private void Update()
         {
             if (inputManager == null) return;
 
-            Vector3 inputDir = GetCameraRelativeDirection(inputManager.move);
+            Vector3 moveDir = locomotion.GetCameraRelativeDirection(inputManager.move);
 
-            // 1. Process Dash Cancel Input
+            // Dash Check
             if (inputManager.dash)
             {
-                inputManager.dash = false; // Consume flag
-
+                inputManager.dash = false;
                 if (CurrentState != PlayerCombatState.ExecutionWindup && CurrentState != PlayerCombatState.Downed)
                 {
                     if (CurrentState == PlayerCombatState.FreeMovement)
                     {
-                        StartDash(inputDir);
+                        StartDash(moveDir);
                         return;
                     }
                     else if (IsAttackingState())
@@ -96,26 +80,24 @@ namespace BoneHaven
                 }
             }
 
-            // 2. FSM Execution
+            // FSM Actions
             switch (CurrentState)
             {
                 case PlayerCombatState.FreeMovement:
-                    HandleFreeMovement(inputDir);
-
                     if (inputManager.slash)
                     {
                         inputManager.slash = false;
-                        StartAttack(1, inputDir);
+                        StartAttack(1, moveDir);
                     }
                     else if (inputManager.powder)
                     {
                         inputManager.powder = false;
-                        if (GunpowderCount > 0) StartPowderThrow(inputDir);
+                        if (GunpowderCount > 0) StartPowderThrow();
                     }
                     else if (inputManager.shoot)
                     {
                         inputManager.shoot = false;
-                        TryExecutionOrQuickShot(inputDir);
+                        TryExecutionOrQuickShot(moveDir);
                     }
                     break;
 
@@ -131,90 +113,49 @@ namespace BoneHaven
             }
         }
 
-        #region Movement & Direction
-
-        private void HandleFreeMovement(Vector3 moveDir)
-        {
-            if (moveDir.sqrMagnitude > 0.01f)
-            {
-                float targetYaw = Mathf.Atan2(moveDir.x, moveDir.z) * Mathf.Rad2Deg;
-                float smoothYaw = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetYaw, ref rotationVelocity, rotationSmoothTime);
-                transform.rotation = Quaternion.Euler(0f, smoothYaw, 0f);
-
-                controller.Move(moveDir * (moveSpeed * Time.deltaTime));
-            }
-
-            OnSpeedUpdated?.Invoke(moveDir.magnitude * moveSpeed);
-        }
-
-        private Vector3 GetCameraRelativeDirection(Vector2 rawInput)
-        {
-            if (rawInput.sqrMagnitude < 0.01f) return Vector3.zero;
-
-            Vector3 camFwd = cameraTransform != null ? cameraTransform.forward : Vector3.forward;
-            Vector3 camRight = cameraTransform != null ? cameraTransform.right : Vector3.right;
-            camFwd.y = 0f;
-            camRight.y = 0f;
-
-            return (camFwd.normalized * rawInput.y + camRight.normalized * rawInput.x).normalized;
-        }
-
         private bool IsAttackingState() =>
             CurrentState == PlayerCombatState.Attack1 ||
             CurrentState == PlayerCombatState.Attack2 ||
             CurrentState == PlayerCombatState.Attack3;
 
-        #endregion
+        #region Attack & Combos
 
-        #region Attack & Combo Pipeline
-
-        private void StartAttack(int comboIndex, Vector3 inputDir)
+        private void StartAttack(int comboIndex, Vector3 moveDir)
         {
             if (activeActionRoutine != null) StopCoroutine(activeActionRoutine);
-            activeActionRoutine = StartCoroutine(AttackRoutine(comboIndex, inputDir));
+            activeActionRoutine = StartCoroutine(AttackRoutine(comboIndex, moveDir));
         }
 
-        private IEnumerator AttackRoutine(int comboIndex, Vector3 inputDir)
+        private IEnumerator AttackRoutine(int comboIndex, Vector3 moveDir)
         {
+            locomotion.LockMovement(true);
             attackBuffered = false;
             dashBuffered = false;
 
-            // 1. Soft-Lock & Lunge
-            Transform target = targetLock != null ? targetLock.GetTarget(inputDir, cameraTransform) : null;
-            Vector3 fallback = inputDir.sqrMagnitude > 0.01f ? inputDir : transform.forward;
-            if (combatLunge != null) combatLunge.ExecuteLunge(target, fallback);
+            Transform target = targetLock != null ? targetLock.GetTarget(new Vector3(inputManager.move.x, 0f, inputManager.move.y), Camera.main.transform) : null;
+            if (combatLunge != null) combatLunge.ExecuteLunge(target, moveDir);
 
-            // 2. Fire Event
             OnAttackExecuted?.Invoke(comboIndex);
 
-            // 3. State & Timings
-            float duration = attack1Duration;
-            float dmg = slashDamage;
-            bool isFinisher = false;
+            float duration = comboIndex switch
+            {
+                1 => attack1Duration,
+                2 => attack2Duration,
+                _ => attack3Duration
+            };
+            float dmg = (comboIndex == 3) ? finisherDamage : slashDamage;
+            bool isFinisher = (comboIndex == 3);
 
-            if (comboIndex == 1)
+            CurrentState = comboIndex switch
             {
-                CurrentState = PlayerCombatState.Attack1;
-                duration = attack1Duration;
-            }
-            else if (comboIndex == 2)
-            {
-                CurrentState = PlayerCombatState.Attack2;
-                duration = attack2Duration;
-            }
-            else if (comboIndex == 3)
-            {
-                CurrentState = PlayerCombatState.Attack3;
-                duration = attack3Duration;
-                dmg = finisherDamage;
-                isFinisher = true;
-            }
+                1 => PlayerCombatState.Attack1,
+                2 => PlayerCombatState.Attack2,
+                _ => PlayerCombatState.Attack3
+            };
 
-            // Deal Damage midway through swing
             yield return new WaitForSeconds(duration * 0.4f);
             ExecuteMeleeHitbox(dmg, isFinisher);
 
-            // Input Buffer Window
             float remainingTime = duration * 0.6f;
             float elapsed = 0f;
 
@@ -224,7 +165,7 @@ namespace BoneHaven
 
                 if (dashBuffered)
                 {
-                    StartDash(inputDir);
+                    StartDash(moveDir);
                     yield break;
                 }
 
@@ -232,7 +173,7 @@ namespace BoneHaven
                 {
                     if (comboIndex < 3)
                     {
-                        StartAttack(comboIndex + 1, inputDir);
+                        StartAttack(comboIndex + 1, moveDir);
                         yield break;
                     }
                 }
@@ -240,6 +181,7 @@ namespace BoneHaven
             }
 
             CurrentState = PlayerCombatState.FreeMovement;
+            locomotion.LockMovement(false);
             activeActionRoutine = null;
         }
 
@@ -265,9 +207,47 @@ namespace BoneHaven
 
         #endregion
 
-        #region Black Powder & Execution
+        #region Dash
 
-        private void StartPowderThrow(Vector3 inputDir)
+        private void StartDash(Vector3 moveDir)
+        {
+            if (activeActionRoutine != null) StopCoroutine(activeActionRoutine);
+            if (combatLunge != null) combatLunge.CancelLunge();
+            activeActionRoutine = StartCoroutine(DashRoutine(moveDir));
+        }
+
+        private IEnumerator DashRoutine(Vector3 moveDir)
+        {
+            CurrentState = PlayerCombatState.DashRoll;
+            IsInvulnerable = true;
+            locomotion.LockMovement(true);
+
+            Vector3 dashDir = moveDir.sqrMagnitude > 0.01f ? moveDir : transform.forward;
+            transform.rotation = Quaternion.LookRotation(dashDir);
+
+            OnDashExecuted?.Invoke();
+
+            float elapsed = 0f;
+            while (elapsed < dashDuration)
+            {
+                elapsed += Time.deltaTime;
+                if (elapsed >= iFrameDuration) IsInvulnerable = false;
+
+                locomotion.ManualMove(dashDir * (dashSpeed * Time.deltaTime));
+                yield return null;
+            }
+
+            IsInvulnerable = false;
+            CurrentState = PlayerCombatState.FreeMovement;
+            locomotion.LockMovement(false);
+            activeActionRoutine = null;
+        }
+
+        #endregion
+
+        #region Powder & Execution
+
+        private void StartPowderThrow()
         {
             if (activeActionRoutine != null) StopCoroutine(activeActionRoutine);
             activeActionRoutine = StartCoroutine(PowderThrowRoutine());
@@ -276,6 +256,7 @@ namespace BoneHaven
         private IEnumerator PowderThrowRoutine()
         {
             CurrentState = PlayerCombatState.BlackPowderThrow;
+            locomotion.LockMovement(true);
             GunpowderCount--;
             OnPowderExecuted?.Invoke();
 
@@ -298,14 +279,15 @@ namespace BoneHaven
 
             yield return new WaitForSeconds(powderThrowDuration * 0.65f);
             CurrentState = PlayerCombatState.FreeMovement;
+            locomotion.LockMovement(false);
             activeActionRoutine = null;
         }
 
-        private void TryExecutionOrQuickShot(Vector3 inputDir)
+        private void TryExecutionOrQuickShot(Vector3 moveDir)
         {
             if (FlintlockAmmo <= 0) return;
 
-            Transform target = targetLock != null ? targetLock.GetTarget(inputDir, cameraTransform) : null;
+            Transform target = targetLock != null ? targetLock.GetTarget(new Vector3(inputManager.move.x, 0f, inputManager.move.y), Camera.main.transform) : null;
 
             if (target != null && target.TryGetComponent(out IDamageable damageable) && damageable.IsStunned)
             {
@@ -318,7 +300,6 @@ namespace BoneHaven
                 }
             }
 
-            // Quick Shot Fallback
             FlintlockAmmo--;
             if (target != null && target.TryGetComponent(out IDamageable normalTarget))
             {
@@ -329,6 +310,7 @@ namespace BoneHaven
         private IEnumerator ExecutionRoutine(Transform target, IDamageable damageable)
         {
             CurrentState = PlayerCombatState.ExecutionWindup;
+            locomotion.LockMovement(true);
             FlintlockAmmo--;
 
             Vector3 lookDir = (target.position - transform.position);
@@ -345,42 +327,7 @@ namespace BoneHaven
             }
 
             CurrentState = PlayerCombatState.FreeMovement;
-            activeActionRoutine = null;
-        }
-
-        #endregion
-
-        #region Dash
-
-        private void StartDash(Vector3 inputDir)
-        {
-            if (activeActionRoutine != null) StopCoroutine(activeActionRoutine);
-            if (combatLunge != null) combatLunge.CancelLunge();
-            activeActionRoutine = StartCoroutine(DashRoutine(inputDir));
-        }
-
-        private IEnumerator DashRoutine(Vector3 inputDir)
-        {
-            CurrentState = PlayerCombatState.DashRoll;
-            IsInvulnerable = true;
-
-            Vector3 dashDir = inputDir.sqrMagnitude > 0.01f ? inputDir : transform.forward;
-            transform.rotation = Quaternion.LookRotation(dashDir);
-
-            OnDashExecuted?.Invoke();
-
-            float elapsed = 0f;
-            while (elapsed < dashDuration)
-            {
-                elapsed += Time.deltaTime;
-                if (elapsed >= iFrameDuration) IsInvulnerable = false;
-
-                controller.Move(dashDir * (dashSpeed * Time.deltaTime));
-                yield return null;
-            }
-
-            IsInvulnerable = false;
-            CurrentState = PlayerCombatState.FreeMovement;
+            locomotion.LockMovement(false);
             activeActionRoutine = null;
         }
 
