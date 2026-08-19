@@ -66,7 +66,7 @@ namespace BoneHaven
         private CharacterController _controller;
         private PlayerInputManager _input;
         private GameObject _mainCamera;
-        private AnimationController animationController;
+        private PlayerAnimationController animationController;
 
         private const float _threshold = 0.01f;
 
@@ -107,7 +107,7 @@ namespace BoneHaven
         {
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<PlayerInputManager>();
-            animationController = GetComponent<AnimationController>();
+            animationController = GetComponent<PlayerAnimationController>();
 #if ENABLE_INPUT_SYSTEM 
             _playerInput = GetComponent<PlayerInput>();
 #else
