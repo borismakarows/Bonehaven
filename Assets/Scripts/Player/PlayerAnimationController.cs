@@ -5,8 +5,9 @@ namespace BoneHaven
     [RequireComponent(typeof(Animator))]
     public class PlayerAnimationController : MonoBehaviour
     {
-        [SerializeField] private PlayerLocomotion locomotion;
-        [SerializeField] private PlayerCombatFSM combatFSM;
+        private PlayerLocomotion locomotion;
+        private PlayerCombatFSM combatFSM;
+        private CombatLunge combatLunge;
         private Animator animator;
 
         private static readonly int HashSpeed = Animator.StringToHash("Speed");
@@ -23,6 +24,7 @@ namespace BoneHaven
             animator = GetComponent<Animator>();
             if (locomotion == null) locomotion = GetComponentInParent<PlayerLocomotion>();
             if (combatFSM == null) combatFSM = GetComponentInParent<PlayerCombatFSM>();
+            if (combatLunge == null) combatLunge = GetComponent<CombatLunge>();
         }
 
         private void OnEnable()
@@ -35,6 +37,7 @@ namespace BoneHaven
                 combatFSM.OnPowderExecuted += PlayPowderAnimation;
                 combatFSM.OnExecutionTriggered += PlayExecutionAnimation;
             }
+            if (combatLunge != null) combatLunge.OnLungeDashTriggered += PlayDashAnimation;
         }
 
         private void OnDisable()
@@ -47,6 +50,7 @@ namespace BoneHaven
                 combatFSM.OnPowderExecuted -= PlayPowderAnimation;
                 combatFSM.OnExecutionTriggered -= PlayExecutionAnimation;
             }
+            if (combatLunge != null) combatLunge.OnLungeDashTriggered -= PlayDashAnimation;
         }
 
         private void UpdateLocomotionAnimation(float speed, float inputMagnitude)

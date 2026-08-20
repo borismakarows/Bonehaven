@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -7,10 +8,13 @@ namespace BoneHaven
     public class CombatLunge : MonoBehaviour
     {
         [Header("Lunge Configuration")]
-        private CharacterController controller;
         [SerializeField] private float strikeDistance = 1.3f;
         [SerializeField] private float lungeDuration = 0.12f;
+        [SerializeField] private float minDashLungeDistance = 1.8f; // Triggers dash leg animation if target is further than this
 
+        public event Action OnLungeDashTriggered; // Event for Animation Controller
+
+        private CharacterController controller;
         private Coroutine currentLungeRoutine;
 
         private void Reset()
@@ -18,7 +22,7 @@ namespace BoneHaven
             controller = GetComponent<CharacterController>();
         }
 
-        void Awake()
+        private void Awake()
         {
             controller = GetComponent<CharacterController>();
         }
@@ -39,7 +43,6 @@ namespace BoneHaven
             }
             else if (fallbackDirection.sqrMagnitude > 0.05f)
             {
-                // Whiff swing: Snap rotation to the intended attack direction
                 transform.rotation = Quaternion.LookRotation(fallbackDirection);
             }
         }
@@ -49,14 +52,19 @@ namespace BoneHaven
             float elapsed = 0f;
             Vector3 startPosition = transform.position;
 
-            // Calculate stopping position in front of the target
             Vector3 toTarget = target.position - startPosition;
             toTarget.y = 0f;
+            float totalDistance = toTarget.magnitude;
+
+            // Trigger lower-body slide/dash animation if closing a noticeable gap
+            if (totalDistance > minDashLungeDistance)
+            {
+                OnLungeDashTriggered?.Invoke();
+            }
 
             Vector3 targetPosition = target.position - (toTarget.normalized * strikeDistance);
             targetPosition.y = startPosition.y;
 
-            // Immediate snap rotation facing the enemy
             if (toTarget.sqrMagnitude > 0.01f)
             {
                 transform.rotation = Quaternion.LookRotation(toTarget.normalized);
@@ -64,13 +72,11 @@ namespace BoneHaven
 
             while (elapsed < lungeDuration)
             {
-                // If the enemy moves or dies mid-lunge, safely break
                 if (target == null) break;
 
                 elapsed += Time.deltaTime;
                 float t = elapsed / lungeDuration;
 
-                // SmoothStep curve gives an instant punch-in feel
                 Vector3 desiredPos = Vector3.Lerp(startPosition, targetPosition, Mathf.SmoothStep(0f, 1f, t));
                 Vector3 motion = desiredPos - transform.position;
 
