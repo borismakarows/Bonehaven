@@ -2,17 +2,30 @@ using UnityEngine;
 
 namespace BoneHaven
 {
+    public enum EnemyType
+    {
+        MeleeDeckhand,
+        RangedBombardier,
+        SkeletonCaptain
+    }
+
     [CreateAssetMenu(fileName = "NewEnemyConfig", menuName = "BoneHaven/Enemy Config")]
     public class EnemyConfigSO : ScriptableObject
     {
         [Header("Identity & Archetype")]
         public string enemyName = "Deckhand Skeleton";
+        public EnemyType enemyType = EnemyType.MeleeDeckhand;
         public GameObject enemyPrefab;
 
         [Header("Base Attributes")]
         public float maxHealth = 45f;
         public float moveSpeed = 3.5f;
         public float rotationSpeed = 8f;
+
+        [Header("Perception & Detection")]
+        [Range(20f, 90f)] public float visionAngle = 45f;
+        public float visionDistance = 7f;
+        public int patrolStartChanceRatio = 30;
 
         [Header("Combat & Attack Profile")]
         public float attackDamage = 15f;

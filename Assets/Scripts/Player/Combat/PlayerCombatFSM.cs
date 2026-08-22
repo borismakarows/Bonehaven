@@ -27,6 +27,11 @@ namespace BoneHaven
         [SerializeField] private float executionRange = 1.8f;
         [SerializeField] private int maxGunpowderPouches = 3;
         [SerializeField] private int maxFlintlockAmmo = 4;
+        [Header("Execution Buff Settings")]
+        [SerializeField] private float executionSpeedBuffMultiplier = 1.25f; 
+        [SerializeField] private float executionBuffDuration = 5.0f;
+        private float attackSpeedMultiplier = 1.0f;
+        private Coroutine buffRoutine;
 
         [Header("Dependencies")]
         private PlayerLocomotion locomotion;
@@ -139,12 +144,14 @@ namespace BoneHaven
 
             OnAttackExecuted?.Invoke(comboIndex);
 
-            float duration = comboIndex switch
+            float baseDuration = comboIndex switch
             {
                 1 => attack1Duration,
                 2 => attack2Duration,
                 _ => attack3Duration
             };
+            float duration = baseDuration / attackSpeedMultiplier;
+
             float dmg = (comboIndex == 3) ? finisherDamage : slashDamage;
             bool isFinisher = (comboIndex == 3);
 
@@ -171,7 +178,7 @@ namespace BoneHaven
                     yield break;
                 }
 
-                if (attackBuffered && (remainingTime - elapsed) <= comboBufferWindow)
+                if (attackBuffered && (remainingTime - elapsed) <= (comboBufferWindow / attackSpeedMultiplier))
                 {
                     if (comboIndex < 3)
                     {
@@ -332,11 +339,28 @@ namespace BoneHaven
             if (damageable != null && damageable.IsAlive)
             {
                 damageable.Execute(transform);
+                
+                
+                ApplyExecutionSpeedBuff();
             }
 
             CurrentState = PlayerCombatState.FreeMovement;
             locomotion.LockMovement(false);
             activeActionRoutine = null;
+        }
+
+        private void ApplyExecutionSpeedBuff()
+        {
+            if (buffRoutine != null) StopCoroutine(buffRoutine);
+            buffRoutine = StartCoroutine(ExecutionSpeedBuffTimerRoutine());
+        }
+
+        private IEnumerator ExecutionSpeedBuffTimerRoutine()
+        {
+            attackSpeedMultiplier = executionSpeedBuffMultiplier; 
+            yield return new WaitForSeconds(executionBuffDuration); 
+            attackSpeedMultiplier = 1.0f; 
+            buffRoutine = null;
         }
 
         #endregion
