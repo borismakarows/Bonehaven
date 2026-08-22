@@ -7,9 +7,9 @@ namespace BoneHaven
     public class PlayerCombatFSM : MonoBehaviour
     {
         [Header("Dash Settings")]
-        [SerializeField] private float dashSpeed = 9f;
-        [SerializeField] private float dashDuration = 0.35f;
-        [SerializeField] private float iFrameDuration = 0.2f;
+        [SerializeField] private float evadeSpeed = 19f;
+        [SerializeField] private float evadeDuration = 1f;
+        [SerializeField] private float iFrameDuration = 0.4f;
 
         [Header("Melee & Combo Settings")]
         [SerializeField] private float attack1Duration = 0.45f;
@@ -34,7 +34,7 @@ namespace BoneHaven
         private CombatLunge combatLunge;
 
         public event Action<int> OnAttackExecuted;
-        public event Action OnDashExecuted;
+        public event Action OnEvadeExecuted;
         public event Action OnPowderExecuted;
         public event Action OnExecutionTriggered;
 
@@ -46,7 +46,7 @@ namespace BoneHaven
         private PlayerInputManager inputManager;
         private Coroutine activeActionRoutine;
         private bool attackBuffered = false;
-        private bool dashBuffered = false;
+        private bool evadeBuffered = false;
 
         private void Awake()
         {
@@ -58,6 +58,8 @@ namespace BoneHaven
 
         private void Update()
         {
+            if (CurrentState == PlayerCombatState.DashRoll || CurrentState == PlayerCombatState.ExecutionWindup) return;
+
             if (inputManager == null) return;
 
             Vector3 moveDir = locomotion.GetCameraRelativeDirection(inputManager.move);
@@ -70,12 +72,12 @@ namespace BoneHaven
                 {
                     if (CurrentState == PlayerCombatState.FreeMovement)
                     {
-                        StartDash(moveDir);
+                        StartEvade(moveDir);
                         return;
                     }
                     else if (IsAttackingState())
                     {
-                        dashBuffered = true;
+                        evadeBuffered = true;
                     }
                 }
             }
@@ -130,7 +132,7 @@ namespace BoneHaven
         {
             locomotion.LockMovement(true);
             attackBuffered = false;
-            dashBuffered = false;
+            evadeBuffered = false;
 
             Transform target = targetLock != null ? targetLock.GetTarget(new Vector3(inputManager.move.x, 0f, inputManager.move.y), Camera.main.transform) : null;
             if (combatLunge != null) combatLunge.ExecuteLunge(target, moveDir);
@@ -163,9 +165,9 @@ namespace BoneHaven
             {
                 elapsed += Time.deltaTime;
 
-                if (dashBuffered)
+                if (evadeBuffered)
                 {
-                    StartDash(moveDir);
+                    StartEvade(moveDir);
                     yield break;
                 }
 
@@ -207,33 +209,38 @@ namespace BoneHaven
 
         #endregion
 
-        #region Dash
+        #region Evade
 
-        private void StartDash(Vector3 moveDir)
+        private void StartEvade(Vector3 moveDir)
         {
             if (activeActionRoutine != null) StopCoroutine(activeActionRoutine);
             if (combatLunge != null) combatLunge.CancelLunge();
-            activeActionRoutine = StartCoroutine(DashRoutine(moveDir));
+            activeActionRoutine = StartCoroutine(EvadeRoutine(moveDir));
         }
 
-        private IEnumerator DashRoutine(Vector3 moveDir)
+        private IEnumerator EvadeRoutine(Vector3 moveDir)
         {
             CurrentState = PlayerCombatState.DashRoll;
             IsInvulnerable = true;
             locomotion.LockMovement(true);
 
-            Vector3 dashDir = moveDir.sqrMagnitude > 0.01f ? moveDir : transform.forward;
-            transform.rotation = Quaternion.LookRotation(dashDir);
+            Vector3 rawDir = moveDir.sqrMagnitude > 0.01f ? -moveDir : -transform.forward;
+            rawDir.y = 0f;
+            Vector3 evadeDir = rawDir.normalized;
 
-            OnDashExecuted?.Invoke();
+            OnEvadeExecuted?.Invoke();
 
             float elapsed = 0f;
-            while (elapsed < dashDuration)
+            while (elapsed < evadeDuration)
             {
                 elapsed += Time.deltaTime;
-                if (elapsed >= iFrameDuration) IsInvulnerable = false;
-
-                locomotion.ManualMove(dashDir * (dashSpeed * Time.deltaTime));
+                
+                if (elapsed >= iFrameDuration) 
+                {
+                    IsInvulnerable = false;
+                }
+               
+                locomotion.ManualMove(evadeDir * (evadeSpeed * Time.deltaTime));
                 yield return null;
             }
 

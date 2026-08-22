@@ -868,6 +868,18 @@ PrefabInstance:
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 5500498472166590335, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: evadeSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5500498472166590335, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: evadeDuration
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 5500498472166590335, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: iFrameDuration
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 5500498472166590335, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: enemyLayer.m_Bits
       value: 512
       objectReference: {fileID: 0}

@@ -15,7 +15,7 @@ namespace BoneHaven
         private static readonly int HashAttack1 = Animator.StringToHash("Attack1");
         private static readonly int HashAttack2 = Animator.StringToHash("Attack2");
         private static readonly int HashAttack3 = Animator.StringToHash("Attack3");
-        private static readonly int HashDash = Animator.StringToHash("Dash");
+        private static readonly int HashEvade = Animator.StringToHash("Evade");
         private static readonly int HashPowder = Animator.StringToHash("ThrowPowder");
         private static readonly int HashExecute = Animator.StringToHash("Execute");
 
@@ -33,11 +33,11 @@ namespace BoneHaven
             if (combatFSM != null)
             {
                 combatFSM.OnAttackExecuted += PlayAttackAnimation;
-                combatFSM.OnDashExecuted += PlayDashAnimation;
+                combatFSM.OnEvadeExecuted += PlayEvadeAnimation;
                 combatFSM.OnPowderExecuted += PlayPowderAnimation;
                 combatFSM.OnExecutionTriggered += PlayExecutionAnimation;
             }
-            if (combatLunge != null) combatLunge.OnLungeDashTriggered += PlayDashAnimation;
+            if (combatLunge != null) combatLunge.OnLungeDashTriggered += PlayEvadeAnimation;
         }
 
         private void OnDisable()
@@ -46,11 +46,11 @@ namespace BoneHaven
             if (combatFSM != null)
             {
                 combatFSM.OnAttackExecuted -= PlayAttackAnimation;
-                combatFSM.OnDashExecuted -= PlayDashAnimation;
+                combatFSM.OnEvadeExecuted -= PlayEvadeAnimation;
                 combatFSM.OnPowderExecuted -= PlayPowderAnimation;
                 combatFSM.OnExecutionTriggered -= PlayExecutionAnimation;
             }
-            if (combatLunge != null) combatLunge.OnLungeDashTriggered -= PlayDashAnimation;
+            if (combatLunge != null) combatLunge.OnLungeDashTriggered -= PlayEvadeAnimation;
         }
 
         private void UpdateLocomotionAnimation(float speed, float inputMagnitude)
@@ -69,7 +69,7 @@ namespace BoneHaven
             }
         }
 
-        private void PlayDashAnimation() => animator.SetTrigger(HashDash);
+        private void PlayEvadeAnimation() => animator.SetTrigger(HashEvade);
         private void PlayPowderAnimation() => animator.SetTrigger(HashPowder);
         private void PlayExecutionAnimation() => animator.SetTrigger(HashExecute);
     }
