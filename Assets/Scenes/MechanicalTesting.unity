@@ -880,6 +880,18 @@ PrefabInstance:
       value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 5500498472166590335, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: attack1Duration
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5500498472166590335, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: attack2Duration
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5500498472166590335, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+      propertyPath: attack3Duration
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5500498472166590335, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: enemyLayer.m_Bits
       value: 512
       objectReference: {fileID: 0}

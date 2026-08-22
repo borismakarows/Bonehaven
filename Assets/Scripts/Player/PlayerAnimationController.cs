@@ -37,7 +37,6 @@ namespace BoneHaven
                 combatFSM.OnPowderExecuted += PlayPowderAnimation;
                 combatFSM.OnExecutionTriggered += PlayExecutionAnimation;
             }
-            if (combatLunge != null) combatLunge.OnLungeDashTriggered += PlayEvadeAnimation;
         }
 
         private void OnDisable()
@@ -50,7 +49,6 @@ namespace BoneHaven
                 combatFSM.OnPowderExecuted -= PlayPowderAnimation;
                 combatFSM.OnExecutionTriggered -= PlayExecutionAnimation;
             }
-            if (combatLunge != null) combatLunge.OnLungeDashTriggered -= PlayEvadeAnimation;
         }
 
         private void UpdateLocomotionAnimation(float speed, float inputMagnitude)

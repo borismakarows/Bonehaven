@@ -10,9 +10,6 @@ namespace BoneHaven
         [Header("Lunge Configuration")]
         [SerializeField] private float strikeDistance = 1.3f;
         [SerializeField] private float lungeDuration = 0.12f;
-        [SerializeField] private float minDashLungeDistance = 1.8f; // Triggers dash leg animation if target is further than this
-
-        public event Action OnLungeDashTriggered; // Event for Animation Controller
 
         private CharacterController controller;
         private Coroutine currentLungeRoutine;
@@ -27,9 +24,6 @@ namespace BoneHaven
             controller = GetComponent<CharacterController>();
         }
 
-        /// <summary>
-        /// Executes a lunge toward a target, or snaps rotation to the fallback input direction on a whiff.
-        /// </summary>
         public void ExecuteLunge(Transform target, Vector3 fallbackDirection)
         {
             if (currentLungeRoutine != null)
@@ -56,11 +50,6 @@ namespace BoneHaven
             toTarget.y = 0f;
             float totalDistance = toTarget.magnitude;
 
-            // Trigger lower-body slide/dash animation if closing a noticeable gap
-            if (totalDistance > minDashLungeDistance)
-            {
-                OnLungeDashTriggered?.Invoke();
-            }
 
             Vector3 targetPosition = target.position - (toTarget.normalized * strikeDistance);
             targetPosition.y = startPosition.y;
