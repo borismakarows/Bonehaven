@@ -881,7 +881,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5500498472166590335, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: attack1Duration
-      value: 0.5
+      value: 0.35
       objectReference: {fileID: 0}
     - target: {fileID: 5500498472166590335, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
       propertyPath: attack2Duration

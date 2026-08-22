@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f2cad1b5d0a7de845834681f1c33c3d6
+guid: 134c66a80f5e62c40a746b6de65b963f
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -31,13 +31,13 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Dash_Lunge
+      name: execution_Rifle
       takeName: mixamo.com
       internalID: -203655887218126122
       firstFrame: 0
-      lastFrame: 46
+      lastFrame: 128
       wrapMode: 0
-      orientationOffsetY: 0
+      orientationOffsetY: -55
       level: 0
       cycleOffset: 0
       loop: 0

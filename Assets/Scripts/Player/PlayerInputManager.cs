@@ -29,7 +29,7 @@ namespace BoneHaven
 		public bool slash;
 		public bool powder;
 		public bool shoot;
-		public bool dash;
+		public bool evade;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -85,7 +85,7 @@ namespace BoneHaven
 		}
 		public void OnSlash(InputValue value) => SlashInput(value.isPressed);
 		public void OnShoot(InputValue value) => ShootInput(value.isPressed);
-		public void OnDash(InputValue value) => DashInput(value.isPressed);
+		public void OnEvade(InputValue value) => EvadeInput(value.isPressed);
 		public void OnPowder(InputValue value) => PowderInput(value.isPressed);
 #endregion
 #endif
@@ -96,7 +96,7 @@ namespace BoneHaven
 		public void SprintInput(bool newSprintState) => sprint = newSprintState;
 		public void SlashInput(bool newSlashState) => slash = newSlashState;
 		public void ShootInput(bool newShootState) => shoot = newShootState;
-		public void DashInput(bool newDashState) => dash = newDashState;
+		public void EvadeInput(bool newEvadeState) => evade = newEvadeState;
 		public void PowderInput(bool newPowderState) => powder = newPowderState;
 #endregion
 

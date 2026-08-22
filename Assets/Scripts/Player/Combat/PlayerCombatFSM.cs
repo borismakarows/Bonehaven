@@ -65,9 +65,9 @@ namespace BoneHaven
             Vector3 moveDir = locomotion.GetCameraRelativeDirection(inputManager.move);
 
             // Dash Check
-            if (inputManager.dash)
+            if (inputManager.evade)
             {
-                inputManager.dash = false;
+                inputManager.evade = false;
                 if (CurrentState != PlayerCombatState.ExecutionWindup && CurrentState != PlayerCombatState.Downed)
                 {
                     if (CurrentState == PlayerCombatState.FreeMovement)
@@ -301,6 +301,7 @@ namespace BoneHaven
                 float dist = Vector3.Distance(transform.position, target.position);
                 if (dist <= executionRange)
                 {
+                    Debug.Log($"Execution target: {target.name}, stunned: {damageable.IsStunned}");
                     if (activeActionRoutine != null) StopCoroutine(activeActionRoutine);
                     activeActionRoutine = StartCoroutine(ExecutionRoutine(target, damageable));
                     return;

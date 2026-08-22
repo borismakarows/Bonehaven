@@ -61,7 +61,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Dash",
+                    "name": "Evade",
                     "type": "Button",
                     "id": "2c3ec510-123a-4905-a2e7-c294a2dce8c0",
                     "expectedControlType": "",
@@ -252,7 +252,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";KeyboardMouse",
-                    "action": "Dash",
+                    "action": "Evade",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
