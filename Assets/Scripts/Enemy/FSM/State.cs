@@ -28,8 +28,7 @@ namespace BoneHaven
         protected readonly int isIdleHash = Animator.StringToHash("isIdle");
         protected readonly int isWalkingHash = Animator.StringToHash("isWalking");
         protected readonly int isRunningHash = Animator.StringToHash("isRunning");
-        protected readonly int isShootingHash = Animator.StringToHash("isShooting");
-        protected readonly int isSlashingHash = Animator.StringToHash("isSlashing");
+        protected readonly int isAttackingHash = Animator.StringToHash("isAttacking");
         protected readonly int isUnbalancedHash = Animator.StringToHash("isUnbalanced");
         protected readonly int isStunnedHash = Animator.StringToHash("isStunned");
         protected readonly int isHurtHash = Animator.StringToHash("isHurt");
@@ -53,7 +52,7 @@ namespace BoneHaven
 
         protected bool CanSeePlayer()
         {
-            if (player == null || config == null) return false;
+            if (player == null || config == null || agent == null) return false;
             Vector3 direction = player.position - agent.transform.position;
             float angle = Vector3.Angle(direction, agent.transform.forward);
 
@@ -62,14 +61,14 @@ namespace BoneHaven
 
         protected bool CanAttackPlayer()
         {
-            if (player == null || config == null) return false;
+            if (player == null || config == null || agent == null) return false;
             float dist = Vector3.Distance(player.position, agent.transform.position);
             return dist <= config.attackRange;
         }
 
         protected void LookAtPlayer()
         {
-            if (player == null || config == null) return;
+            if (player == null || config == null || npc == null) return;
             Vector3 direction = player.position - npc.transform.position;
             direction.y = 0;
             if (direction.sqrMagnitude > 0.001f)
@@ -114,7 +113,7 @@ namespace BoneHaven
         public override void Enter()
         {
             anim.SetTrigger(isIdleHash);
-            if (agent.isOnNavMesh) agent.isStopped = true;
+            if (agent != null && agent.isOnNavMesh) agent.isStopped = true;
             base.Enter();
         }
 
@@ -153,7 +152,7 @@ namespace BoneHaven
         {
             currentIndex = 0;
             anim.SetTrigger(isWalkingHash);
-            if (agent.isOnNavMesh)
+            if (agent != null && agent.isOnNavMesh)
             {
                 agent.isStopped = false;
                 agent.speed = config != null ? config.moveSpeed * 0.6f : 2f;
@@ -172,7 +171,7 @@ namespace BoneHaven
 
             if (GameEnvironment.Singleton != null && GameEnvironment.Singleton.Checkpoints.Count > 0)
             {
-                if (agent.remainingDistance < 1f)
+                if (agent != null && agent.isOnNavMesh && agent.remainingDistance < 1f)
                 {
                     currentIndex = (currentIndex + 1) % GameEnvironment.Singleton.Checkpoints.Count;
                     agent.SetDestination(GameEnvironment.Singleton.Checkpoints[currentIndex].position);
@@ -197,8 +196,15 @@ namespace BoneHaven
 
         public override void Enter()
         {
+            anim.ResetTrigger(isIdleHash);
+            anim.ResetTrigger(isWalkingHash);
+            anim.ResetTrigger(isUnbalancedHash);
+            anim.ResetTrigger(isStunnedHash);
+            anim.ResetTrigger(isHurtHash);
+
             anim.SetTrigger(isRunningHash);
-            if (agent.isOnNavMesh)
+
+            if (agent != null && agent.isOnNavMesh)
             {
                 agent.isStopped = false;
                 agent.speed = config != null ? config.moveSpeed : 4f;
@@ -210,14 +216,17 @@ namespace BoneHaven
         {
             if (player == null) return;
 
-            if (agent.isOnNavMesh) agent.SetDestination(player.position);
+            if (agent != null && agent.isOnNavMesh)
+            {
+                agent.SetDestination(player.position);
+            }
 
             if (CanAttackPlayer())
             {
                 nextState = new Attack(npc, agent, config, anim, player);
                 stage = EVENT.EXIT;
             }
-            else if (!CanSeePlayer() && agent.remainingDistance <= agent.stoppingDistance)
+            else if (!CanSeePlayer() && agent != null && agent.isOnNavMesh && agent.remainingDistance <= agent.stoppingDistance)
             {
                 nextState = new Idle(npc, agent, config, anim, player);
                 stage = EVENT.EXIT;
@@ -243,14 +252,10 @@ namespace BoneHaven
 
         public override void Enter()
         {
-            if (agent.isOnNavMesh) agent.isStopped = true;
+            if (agent != null && agent.isOnNavMesh) agent.isStopped = true;
             attackTimer = 0f;
 
-            if (config != null && config.enemyType == EnemyType.RangedBombardier)
-                anim.SetTrigger(isShootingHash);
-            else
-                anim.SetTrigger(isSlashingHash);
-
+            anim.SetTrigger(isAttackingHash);
             base.Enter();
         }
 
@@ -270,19 +275,15 @@ namespace BoneHaven
                 else
                 {
                     attackTimer = 0f;
-                    if (config != null && config.enemyType == EnemyType.RangedBombardier)
-                        anim.SetTrigger(isShootingHash);
-                    else
-                        anim.SetTrigger(isSlashingHash);
+                    anim.SetTrigger(isAttackingHash);
                 }
             }
         }
 
         public override void Exit()
         {
-            anim.ResetTrigger(isSlashingHash);
-            anim.ResetTrigger(isShootingHash);
-            if (agent.isOnNavMesh) agent.isStopped = false;
+            anim.ResetTrigger(isAttackingHash);
+            if (agent != null && agent.isOnNavMesh) agent.isStopped = false;
             base.Exit();
         }
     }
@@ -306,7 +307,7 @@ namespace BoneHaven
 
         public override void Enter()
         {
-            if (agent.isOnNavMesh) agent.isStopped = true;
+            if (agent != null && agent.isOnNavMesh) agent.isStopped = true;
             anim.SetTrigger(isHurtHash);
             elapsed = 0f;
             base.Enter();
@@ -327,7 +328,7 @@ namespace BoneHaven
         public override void Exit()
         {
             anim.ResetTrigger(isHurtHash);
-            if (agent.isOnNavMesh) agent.isStopped = false;
+            if (agent != null && agent.isOnNavMesh) agent.isStopped = false;
             base.Exit();
         }
     }
@@ -342,7 +343,7 @@ namespace BoneHaven
 
         public override void Enter()
         {
-            if (agent.isOnNavMesh) agent.isStopped = true;
+            if (agent != null && agent.isOnNavMesh) agent.isStopped = true;
             anim.SetTrigger(isUnbalancedHash);
             base.Enter();
         }
@@ -350,7 +351,7 @@ namespace BoneHaven
         public override void Exit()
         {
             anim.ResetTrigger(isUnbalancedHash);
-            if (agent.isOnNavMesh) agent.isStopped = false;
+            if (agent != null && agent.isOnNavMesh) agent.isStopped = false;
             base.Exit();
         }
     }
@@ -365,7 +366,7 @@ namespace BoneHaven
 
         public override void Enter()
         {
-            if (agent.isOnNavMesh) agent.isStopped = true;
+            if (agent != null && agent.isOnNavMesh) agent.isStopped = true;
             anim.SetTrigger(isStunnedHash);
             base.Enter();
         }
@@ -373,7 +374,7 @@ namespace BoneHaven
         public override void Exit()
         {
             anim.ResetTrigger(isStunnedHash);
-            if (agent.isOnNavMesh) agent.isStopped = false;
+            if (agent != null && agent.isOnNavMesh) agent.isStopped = false;
             base.Exit();
         }
     }
@@ -388,10 +389,27 @@ namespace BoneHaven
 
         public override void Enter()
         {
-            if (agent.isOnNavMesh) agent.isStopped = true;
-            agent.enabled = false;
+            if (agent != null && agent.isOnNavMesh)
+            {
+                agent.isStopped = true;
+                agent.enabled = false;
+            }
+
+            anim.ResetTrigger(isAttackingHash);
+            anim.ResetTrigger(isRunningHash);
+            anim.ResetTrigger(isWalkingHash);
+            anim.ResetTrigger(isIdleHash);
+            anim.ResetTrigger(isHurtHash);
+            anim.ResetTrigger(isUnbalancedHash);
+            anim.ResetTrigger(isStunnedHash);
+
             anim.SetTrigger(isDeadHash);
             base.Enter();
+        }
+
+        public override void Update()
+        {
+            // Ölüm durumunda döngü işletilmez
         }
     }
 

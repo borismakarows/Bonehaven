@@ -10,17 +10,41 @@ namespace BoneHaven
         [Header("Configuration")]
         [SerializeField] private EnemyConfigSO config;
 
+        [Header("Death Settings")]
+        [SerializeField] private float despawnDelay = 3.5f;
+
+        [Header("Melee Attack Settings")]
+        [SerializeField] private Transform attackPoint;
+        [SerializeField] private float attackRadius = 1.2f;
+        [SerializeField] private LayerMask playerLayer;
+
+        [Header("Ranged Attack Settings")]
+        [SerializeField] private GameObject bombPrefab;
+        [SerializeField] private Transform throwPoint;
+
+        [Header("Loot Drop Prefabs")]
+        [SerializeField] private GameObject powderDropPrefab;
+        [SerializeField] private GameObject ammoDropPrefab;
+        [SerializeField] private GameObject healthDropPrefab;
+
+
         [Header("State Status")]
         [SerializeField] private float currentHealth;
         public bool IsAlive => currentHealth > 0f;
         public bool IsStunned { get; private set; } = false;
         public bool IsUnbalanced { get; private set; } = false;
 
-        private AI aiController;
+                private AI aiController;
         private Coroutine statusRoutine;
+        
+        [Header("Combo & Stun Tracking")]
+        [SerializeField] private int comboHitCount = 0;
+        private float lastHitTime;
+        private const float comboResetDuration = 2.0f;
         private int hitsReceivedWhilePowdered = 0;
 
         public event Action OnDamaged;
+
         public event Action OnStunStateEntered;
         public event Action OnDeath;
 
@@ -33,11 +57,17 @@ namespace BoneHaven
             }
         }
 
-        public void TakeDamage(float amount, Vector3 hitPoint, Vector3 hitDirection)
+                public void TakeDamage(float amount, Vector3 hitPoint, Vector3 hitDirection)
         {
             if (!IsAlive) return;
 
+            // Update Combo Logic
+            if (Time.time - lastHitTime > comboResetDuration) comboHitCount = 0;
+            
             currentHealth = Mathf.Max(0f, currentHealth - amount);
+            lastHitTime = Time.time;
+            comboHitCount++;
+
             OnDamaged?.Invoke();
 
             if (currentHealth <= 0f)
@@ -46,24 +76,46 @@ namespace BoneHaven
                 return;
             }
 
-            // Stun condition: Hit while unbalanced/powdered or reaching combo threshold
+            // --- STUN CONDITIONS ---
+
+            // 1. Combo Stun (3 Hits)
+            if (comboHitCount >= 3)
+            {
+                TriggerStun();
+                return;
+            }
+
+            // 2. Powder then Hit Stun
             if (IsUnbalanced)
             {
                 hitsReceivedWhilePowdered++;
-                if (hitsReceivedWhilePowdered >= (config != null ? config.hitsToStunWithPowder : 1))
+                int requiredHits = config != null ? config.hitsToStunWithPowder : 1;
+
+                if (hitsReceivedWhilePowdered >= requiredHits)
                 {
                     TriggerStun();
                     return;
                 }
             }
 
-            // Interrupt AI state to Hurt
-            aiController.TriggerHurt(hitDirection);
+            // 3. Normal Darbe Tepkisi (Stun değilken)
+            if (!IsStunned)
+            {
+                aiController.TriggerHurt(hitDirection);
+            }
         }
 
-        public void ApplyBlackPowder()
+
+                public void ApplyBlackPowder()
         {
             if (!IsAlive || IsStunned) return;
+
+            // 3. Hit then Powder Stun (within 0.8s of being hit)
+            if (Time.time - lastHitTime < 0.8f)
+            {
+                TriggerStun();
+                return;
+            }
 
             IsUnbalanced = true;
             hitsReceivedWhilePowdered = 0;
@@ -74,20 +126,28 @@ namespace BoneHaven
             aiController.TriggerUnbalanced();
         }
 
+
         private IEnumerator UnbalancedRoutine()
         {
             float duration = config != null ? config.unbalancedDuration : 1.2f;
             yield return new WaitForSeconds(duration);
+
             IsUnbalanced = false;
             statusRoutine = null;
+
+            if (IsAlive && !IsStunned)
+            {
+                aiController.RecoverFromUnbalanced();
+            }
         }
 
-        private void TriggerStun()
+                private void TriggerStun()
         {
             if (!IsAlive) return;
 
             IsStunned = true;
             IsUnbalanced = false;
+            comboHitCount = 0;
 
             if (statusRoutine != null) StopCoroutine(statusRoutine);
             statusRoutine = StartCoroutine(StunRoutine());
@@ -96,11 +156,12 @@ namespace BoneHaven
             aiController.TriggerStun();
         }
 
+
         private IEnumerator StunRoutine()
         {
             float duration = config != null ? config.stunDuration : 2.5f;
             yield return new WaitForSeconds(duration);
-            
+
             IsStunned = false;
             statusRoutine = null;
             aiController.RecoverFromStun();
@@ -120,16 +181,96 @@ namespace BoneHaven
             Die();
         }
 
+        public void OnBombThrowAnimationEvent()
+        {
+            if (!IsAlive || bombPrefab == null || throwPoint == null) return;
+
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj == null) return;
+
+            Vector3 spawnPos = throwPoint.position;
+            GameObject bombObj = Instantiate(bombPrefab, spawnPos, Quaternion.identity);
+
+            Collider enemyCollider = GetComponent<Collider>();
+
+            if (bombObj.TryGetComponent(out BombProjectile projectile))
+            {
+                Vector3 targetPos = playerObj.transform.position;
+                projectile.Launch(targetPos, enemyCollider, 1.1f);
+            }
+        }
+
+        public void OnMeleeAttackHitEvent()
+        {
+            if (!IsAlive) return;
+
+            Transform hitOrigin = attackPoint != null ? attackPoint : transform;
+            Collider[] hits = Physics.OverlapSphere(hitOrigin.position, attackRadius, playerLayer);
+
+            float damage = config != null ? config.attackDamage : 15f;
+
+            foreach (var hit in hits)
+            {
+                if (hit.CompareTag("Player") && hit.TryGetComponent(out IDamageable playerDamageable))
+                {
+                    Vector3 pushDir = (hit.transform.position - transform.position).normalized;
+                    playerDamageable.TakeDamage(damage, hit.bounds.center, pushDir);
+                    break; // Stop after hitting the player once
+                }
+            }
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            if (attackPoint != null)
+            {
+                Gizmos.color = Color.magenta;
+                Gizmos.DrawWireSphere(attackPoint.position, attackRadius);
+            }
+        }
+
         private void SpawnLoot(bool guaranteedHealth)
         {
-            // Loot drop logic mapped to EnemyConfigSO drop rates
+            Vector3 spawnPos = transform.position + Vector3.up * 0.5f;
+
+            // Guaranteed drop on execution
+            if (guaranteedHealth && healthDropPrefab != null)
+            {
+                Instantiate(healthDropPrefab, spawnPos, Quaternion.identity);
+            }
+
+            if (config == null) return;
+
+            // Roll for Gunpowder
+            if (powderDropPrefab != null && UnityEngine.Random.value <= config.gunpowderDropChance)
+            {
+                Vector3 offset = UnityEngine.Random.insideUnitSphere * 0.4f;
+                offset.y = 0;
+                Instantiate(powderDropPrefab, spawnPos + offset, Quaternion.identity);
+            }
+
+            // Roll for Ammo
+            if (ammoDropPrefab != null && UnityEngine.Random.value <= config.ammoDropChance)
+            {
+                Vector3 offset = UnityEngine.Random.insideUnitSphere * 0.4f;
+                offset.y = 0;
+                Instantiate(ammoDropPrefab, spawnPos + offset, Quaternion.identity);
+            }
         }
 
         private void Die()
         {
+            if (statusRoutine != null) StopCoroutine(statusRoutine);
+            StopAllCoroutines();
+
+            SpawnLoot(false);
             OnDeath?.Invoke();
             aiController.TriggerDeath();
-            Destroy(gameObject, 1.5f);
+
+            Collider col = GetComponent<Collider>();
+            if (col != null) col.enabled = false;
+
+            Destroy(gameObject, despawnDelay);
         }
     }
 }

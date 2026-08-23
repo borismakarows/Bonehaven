@@ -16,10 +16,11 @@ namespace BoneHaven
         private static readonly int HashAttack2 = Animator.StringToHash("Attack2");
         private static readonly int HashAttack3 = Animator.StringToHash("Attack3");
         private static readonly int HashEvade = Animator.StringToHash("Evade");
-        private static readonly int HashPowder = Animator.StringToHash("ThrowPowder");
-        private static readonly int HashExecute = Animator.StringToHash("Execute");
+                private static readonly int HashPowder = Animator.StringToHash("ThrowPowder");
+                private static readonly int HashExecute = Animator.StringToHash("Execute");
 
-        private void Awake()
+                private void Awake()
+
         {
             animator = GetComponent<Animator>();
             if (locomotion == null) locomotion = GetComponentInParent<PlayerLocomotion>();
@@ -34,8 +35,8 @@ namespace BoneHaven
             {
                 combatFSM.OnAttackExecuted += PlayAttackAnimation;
                 combatFSM.OnEvadeExecuted += PlayEvadeAnimation;
-                combatFSM.OnPowderExecuted += PlayPowderAnimation;
-                combatFSM.OnExecutionTriggered += PlayExecutionAnimation;
+                                combatFSM.OnPowderExecuted += PlayPowderAnimation;
+                                combatFSM.OnExecutionTriggered += PlayExecutionAnimation;
             }
         }
 
@@ -44,12 +45,14 @@ namespace BoneHaven
             if (locomotion != null) locomotion.OnLocomotionUpdated -= UpdateLocomotionAnimation;
             if (combatFSM != null)
             {
-                combatFSM.OnAttackExecuted -= PlayAttackAnimation;
-                combatFSM.OnEvadeExecuted -= PlayEvadeAnimation;
-                combatFSM.OnPowderExecuted -= PlayPowderAnimation;
-                combatFSM.OnExecutionTriggered -= PlayExecutionAnimation;
+                                combatFSM.OnAttackExecuted -= PlayAttackAnimation;
+                                combatFSM.OnEvadeExecuted -= PlayEvadeAnimation;
+                                combatFSM.OnPowderExecuted -= PlayPowderAnimation;
+                                combatFSM.OnExecutionTriggered -= PlayExecutionAnimation;
             }
         }
+
+
 
         private void UpdateLocomotionAnimation(float speed, float inputMagnitude)
         {
@@ -67,8 +70,14 @@ namespace BoneHaven
             }
         }
 
-        private void PlayEvadeAnimation() => animator.SetTrigger(HashEvade);
+                private void PlayEvadeAnimation() => animator.SetTrigger(HashEvade);
         private void PlayPowderAnimation() => animator.SetTrigger(HashPowder);
-        private void PlayExecutionAnimation() => animator.SetTrigger(HashExecute);
+                private void PlayExecutionAnimation()
+        {
+            animator.ResetTrigger(HashAttack1);
+            animator.ResetTrigger(HashAttack2);
+            animator.ResetTrigger(HashAttack3);
+            animator.SetTrigger(HashExecute);
+        }
     }
 }

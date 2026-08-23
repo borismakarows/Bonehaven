@@ -57,6 +57,14 @@ namespace BoneHaven
             currentState = new Unbalanced(gameObject, agent, enemyConfig, anim, player);
         }
 
+        public void RecoverFromUnbalanced()
+        {
+            if (currentState is Unbalanced)
+            {
+                currentState = new Pursue(gameObject, agent, enemyConfig, anim, player);
+            }
+        }
+
         public void TriggerStun()
         {
             currentState = new Stunned(gameObject, agent, enemyConfig, anim, player);

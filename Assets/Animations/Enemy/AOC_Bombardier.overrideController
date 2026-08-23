@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: AOC_Bombardier
+  m_Controller: {fileID: 9100000, guid: 33546b0c0475a4148a155012a00604e4, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: af6ef83d98527524cbef64a107944228, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: af6ef83d98527524cbef64a107944228, type: 2}
+  - m_OriginalClip: {fileID: -203655887218126122, guid: ff520a02816902b42a973b0ced67cc86, type: 3}
+    m_OverrideClip: {fileID: -203655887218126122, guid: ff520a02816902b42a973b0ced67cc86, type: 3}
+  - m_OriginalClip: {fileID: -203655887218126122, guid: ceb12c825888b2d47aa450bfe8214e6b, type: 3}
+    m_OverrideClip: {fileID: -203655887218126122, guid: ceb12c825888b2d47aa450bfe8214e6b, type: 3}
+  - m_OriginalClip: {fileID: 7400000, guid: da285814eec27d24fa6f32da6a976fb9, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: da285814eec27d24fa6f32da6a976fb9, type: 2}
+  - m_OriginalClip: {fileID: -203655887218126122, guid: 0f157a656efac97479fc2323667d60b5, type: 3}
+    m_OverrideClip: {fileID: -203655887218126122, guid: 0f157a656efac97479fc2323667d60b5, type: 3}
+  - m_OriginalClip: {fileID: 7400000, guid: 004b235df376b6c4488dc4a2b055a4c1, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 004b235df376b6c4488dc4a2b055a4c1, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 5641dcd4e1d5eb243bc389dd83bd7948, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 5641dcd4e1d5eb243bc389dd83bd7948, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: aca56e4d6e6153148a6118f7deeb98f9, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: d933422bb15108b46bfd3e62d1b8c24f, type: 2}

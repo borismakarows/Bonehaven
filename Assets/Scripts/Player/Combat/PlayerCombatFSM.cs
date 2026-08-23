@@ -38,22 +38,26 @@ namespace BoneHaven
         private SoftTargetLock targetLock;
         private CombatLunge combatLunge;
 
-        public event Action<int> OnAttackExecuted;
+                public event Action<int> OnAttackExecuted;
         public event Action OnEvadeExecuted;
-        public event Action OnPowderExecuted;
+                public event Action OnPowderExecuted;
         public event Action OnExecutionTriggered;
 
         public PlayerCombatState CurrentState { get; private set; } = PlayerCombatState.FreeMovement;
+
+
         public bool IsInvulnerable { get; private set; } = false;
         public int GunpowderCount { get; private set; } = 3;
         public int FlintlockAmmo { get; private set; } = 4;
 
-        private PlayerInputManager inputManager;
+                private PlayerInputManager inputManager;
         private Coroutine activeActionRoutine;
         private bool attackBuffered = false;
         private bool evadeBuffered = false;
+        private bool shootBuffered = false;
 
         private void Awake()
+
         {
             inputManager = GetComponent<PlayerInputManager>();
             if (locomotion == null) locomotion = GetComponent<PlayerLocomotion>();
@@ -108,7 +112,7 @@ namespace BoneHaven
                     }
                     break;
 
-                case PlayerCombatState.Attack1:
+                                case PlayerCombatState.Attack1:
                 case PlayerCombatState.Attack2:
                 case PlayerCombatState.Attack3:
                     if (inputManager.slash)
@@ -116,7 +120,13 @@ namespace BoneHaven
                         inputManager.slash = false;
                         attackBuffered = true;
                     }
+                    if (inputManager.shoot)
+                    {
+                        inputManager.shoot = false;
+                        shootBuffered = true;
+                    }
                     break;
+
             }
         }
 
@@ -133,11 +143,13 @@ namespace BoneHaven
             activeActionRoutine = StartCoroutine(AttackRoutine(comboIndex, moveDir));
         }
 
-        private IEnumerator AttackRoutine(int comboIndex, Vector3 moveDir)
+                private IEnumerator AttackRoutine(int comboIndex, Vector3 moveDir)
         {
             locomotion.LockMovement(true);
             attackBuffered = false;
             evadeBuffered = false;
+            shootBuffered = false;
+
 
             Transform target = targetLock != null ? targetLock.GetTarget(new Vector3(inputManager.move.x, 0f, inputManager.move.y), Camera.main.transform) : null;
             if (combatLunge != null) combatLunge.ExecuteLunge(target, moveDir);
@@ -172,13 +184,20 @@ namespace BoneHaven
             {
                 elapsed += Time.deltaTime;
 
-                if (evadeBuffered)
+                                if (evadeBuffered)
                 {
                     StartEvade(moveDir);
                     yield break;
                 }
 
+                if (shootBuffered && (remainingTime - elapsed) <= (comboBufferWindow / attackSpeedMultiplier))
+                {
+                    TryExecutionOrQuickShot(moveDir);
+                    yield break;
+                }
+
                 if (attackBuffered && (remainingTime - elapsed) <= (comboBufferWindow / attackSpeedMultiplier))
+
                 {
                     if (comboIndex < 3)
                     {
@@ -297,57 +316,62 @@ namespace BoneHaven
             activeActionRoutine = null;
         }
 
-        private void TryExecutionOrQuickShot(Vector3 moveDir)
-        {
-            if (FlintlockAmmo <= 0) return;
-
-            Transform target = targetLock != null ? targetLock.GetTarget(new Vector3(inputManager.move.x, 0f, inputManager.move.y), Camera.main.transform) : null;
-
-            if (target != null && target.TryGetComponent(out IDamageable damageable) && damageable.IsStunned)
-            {
-                float dist = Vector3.Distance(transform.position, target.position);
-                if (dist <= executionRange)
+                private void TryExecutionOrQuickShot(Vector3 moveDir)
                 {
-                    Debug.Log($"Execution target: {target.name}, stunned: {damageable.IsStunned}");
+                    if (FlintlockAmmo <= 0) return;
+                    shootBuffered = false;
+
+                    Transform target = targetLock != null ? targetLock.GetTarget(new Vector3(inputManager.move.x, 0f, inputManager.move.y), Camera.main.transform) : null;
+                    IDamageable damageable = null;
+                    bool isStunnedOrUnbalanced = false;
+
+                    if (target != null && target.TryGetComponent(out damageable))
+                    {
+                        float dist = Vector3.Distance(transform.position, target.position);
+                        isStunnedOrUnbalanced = (damageable.IsStunned || damageable.IsUnbalanced) && dist <= (executionRange + 0.5f);
+                    }
+
+                    // Always start the execution routine/animation regardless of target state
                     if (activeActionRoutine != null) StopCoroutine(activeActionRoutine);
-                    activeActionRoutine = StartCoroutine(ExecutionRoutine(target, damageable));
-                    return;
+                    activeActionRoutine = StartCoroutine(ExecutionRoutine(target, damageable, isStunnedOrUnbalanced));
                 }
-            }
 
-            FlintlockAmmo--;
-            if (target != null && target.TryGetComponent(out IDamageable normalTarget))
-            {
-                normalTarget.TakeDamage(30f, target.position, transform.forward);
-            }
-        }
+                private IEnumerator ExecutionRoutine(Transform target, IDamageable damageable, bool isFinisher)
+                {
+                    CurrentState = PlayerCombatState.ExecutionWindup;
+                    locomotion.LockMovement(true);
+                    FlintlockAmmo--;
 
-        private IEnumerator ExecutionRoutine(Transform target, IDamageable damageable)
-        {
-            CurrentState = PlayerCombatState.ExecutionWindup;
-            locomotion.LockMovement(true);
-            FlintlockAmmo--;
+                    if (target != null)
+                    {
+                        Vector3 lookDir = (target.position - transform.position);
+                        lookDir.y = 0f;
+                        if (lookDir.sqrMagnitude > 0.01f) transform.rotation = Quaternion.LookRotation(lookDir.normalized);
+                    }
 
-            Vector3 lookDir = (target.position - transform.position);
-            lookDir.y = 0f;
-            if (lookDir.sqrMagnitude > 0.01f) transform.rotation = Quaternion.LookRotation(lookDir.normalized);
+                    OnExecutionTriggered?.Invoke();
 
-            OnExecutionTriggered?.Invoke();
+                    yield return new WaitForSeconds(executionWindupDuration);
 
-            yield return new WaitForSeconds(executionWindupDuration);
+                    if (damageable != null && damageable.IsAlive)
+                    {
+                        if (isFinisher)
+                        {
+                            damageable.Execute(transform);
+                            ApplyExecutionSpeedBuff();
+                        }
+                        else
+                        {
+                            // Regular damage if not stunned/unbalanced
+                            damageable.TakeDamage(30f, target.position, transform.forward);
+                        }
+                    }
 
-            if (damageable != null && damageable.IsAlive)
-            {
-                damageable.Execute(transform);
-                
-                
-                ApplyExecutionSpeedBuff();
-            }
+                    CurrentState = PlayerCombatState.FreeMovement;
+                    locomotion.LockMovement(false);
+                    activeActionRoutine = null;
+                }
 
-            CurrentState = PlayerCombatState.FreeMovement;
-            locomotion.LockMovement(false);
-            activeActionRoutine = null;
-        }
 
         private void ApplyExecutionSpeedBuff()
         {
