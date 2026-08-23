@@ -2,13 +2,13 @@ using UnityEngine;
 
 namespace BoneHaven
 {
-    public enum LootType { Gunpowder, Ammo, Health }
-
     [RequireComponent(typeof(SphereCollider))]
     public class LootPickup : MonoBehaviour
     {
-        [SerializeField] private LootType lootType;
-        [SerializeField] private int amount = 1;
+        [Header("Item Data")]
+        [SerializeField] private Item itemData;
+
+        [Header("Animation")]
         [SerializeField] private float bobbingSpeed = 2.5f;
         [SerializeField] private float bobbingHeight = 0.15f;
 
@@ -30,8 +30,11 @@ namespace BoneHaven
         {
             if (other.CompareTag("Player"))
             {
-                // Hook to your PlayerInventory / Stats manager here
-                // e.g., other.GetComponent<PlayerInventory>().AddLoot(lootType, amount);
+                if (InventoryManager.Instance != null && itemData != null)
+                {
+                    InventoryManager.Instance.AddItem(itemData);
+                }
+
                 Destroy(gameObject);
             }
         }
