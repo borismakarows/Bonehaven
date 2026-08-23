@@ -10,10 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ede44d96b2d512b409359aa7ac86bc04, type: 3}
-  m_Name: Wave2_Courtyard
+  m_Name: Battle1_Beach
   m_EditorClassIdentifier: Assembly-CSharp::BoneHaven.WaveConfigSO
-  waveNumber: 1
-  waveTitle: 'Wave 1: The Beach Landing'
-  spawnGroups: []
-  initialWaveDelay: 2
-  keyDropPrefab: {fileID: 0}
+  battleName: 'Battle 1: Beach Landing'
+  waves:
+  - waveName: Wave 1
+    delayBeforeWave: 0
+    deckhandCount: 3
+    bombardierCount: 3
+  - waveName: Wave 2
+    delayBeforeWave: 2
+    deckhandCount: 4
+    bombardierCount: 2
+  completionReward: {fileID: 0}

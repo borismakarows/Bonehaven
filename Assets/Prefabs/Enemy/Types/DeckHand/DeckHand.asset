@@ -10,24 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 19788369c1aa5d04c9d4c50aa9f1c51b, type: 3}
-  m_Name: Bombardier
+  m_Name: DeckHand
   m_EditorClassIdentifier: Assembly-CSharp::BoneHaven.EnemyConfigSO
-  enemyName: Bombardier
-  enemyType: 1
-  enemyPrefab: {fileID: 0}
-  maxHealth: 500
-  moveSpeed: 3
+  enemyName: Deckhand Skeleton
+  enemyType: 0
+  enemyPrefab: {fileID: 8361930415225898003, guid: 6cbee579b0d6e4046bac0cbeda7828a2, type: 3}
+  maxHealth: 150
+  moveSpeed: 4
   rotationSpeed: 8
   visionAngle: 45
-  visionDistance: 12
+  visionDistance: 7
   patrolStartChanceRatio: 30
   attackDamage: 15
-  attackRange: 8
+  attackRange: 1.6
   attackWindup: 0.5
-  attackCooldown: 3.5
+  attackCooldown: 2
   stunDuration: 2.5
   unbalancedDuration: 1.2
   hitsToStunWithPowder: 1
   gunpowderDropChance: 0.5
-  ammoDropChance: 1
+  ammoDropChance: 0.5
   pityIncreasePerKill: 0.15

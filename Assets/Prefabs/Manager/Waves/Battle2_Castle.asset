@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ede44d96b2d512b409359aa7ac86bc04, type: 3}
-  m_Name: Wave1_Beach
+  m_Name: Battle2_Castle
   m_EditorClassIdentifier: Assembly-CSharp::BoneHaven.WaveConfigSO
   waveNumber: 1
   waveTitle: 'Wave 1: The Beach Landing'

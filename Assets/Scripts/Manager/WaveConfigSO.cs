@@ -5,26 +5,27 @@ using UnityEngine;
 namespace BoneHaven
 {
     [Serializable]
-    public struct EnemySpawnGroup
+    public class Wave
     {
-        public EnemyConfigSO enemyConfig;
-        public int count;
-        [Tooltip("Delay AFTER this entire group batch is spawned before moving to the next group")]
-        public float delayAfterGroup;
+        [Header("Wave Info")]
+        public string waveName = "Wave 1";
+        public float delayBeforeWave = 2.0f;
+
+        [Header("Enemy Counts")]
+        public int deckhandCount = 3;
+        public int bombardierCount = 1;
     }
 
-    [CreateAssetMenu(fileName = "NewWaveConfig", menuName = "BoneHaven/Wave Config")]
+    [CreateAssetMenu(fileName = "NewBattleConfig", menuName = "BoneHaven/Battle Config")]
     public class WaveConfigSO : ScriptableObject
     {
-        [Header("Wave Meta")]
-        public int waveNumber = 1;
-        public string waveTitle = "Wave 1: The Beach Landing";
+        [Header("Battle Metadata")]
+        public string battleName = "Battle 1: Beach Landing";
 
-        [Header("Spawning Sequence")]
-        public List<EnemySpawnGroup> spawnGroups = new List<EnemySpawnGroup>();
-        public float initialWaveDelay = 2.0f;
+        [Header("Waves")]
+        public List<Wave> waves = new List<Wave>();
 
-        [Header("Progression Rewards")]
-        public GameObject progressionReward;
+        [Header("Battle Reward")]
+        public GameObject completionReward;
     }
 }
