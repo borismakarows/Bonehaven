@@ -25,8 +25,7 @@ namespace BoneHaven
         [SerializeField] private float powderThrowDuration = 0.4f;
         [SerializeField] private float executionWindupDuration = 0.35f;
         [SerializeField] private float executionRange = 1.8f;
-        [SerializeField] private int maxGunpowderPouches = 3;
-        [SerializeField] private int maxFlintlockAmmo = 4;
+
         [Header("Execution Buff Settings")]
         [SerializeField] private float executionSpeedBuffMultiplier = 1.25f; 
         [SerializeField] private float executionBuffDuration = 5.0f;
@@ -37,29 +36,26 @@ namespace BoneHaven
         private PlayerLocomotion locomotion;
         private SoftTargetLock targetLock;
         private CombatLunge combatLunge;
+        private PlayerInputManager inputManager;
+        private PlayerInventory inventory;
 
-                public event Action<int> OnAttackExecuted;
+        public event Action<int> OnAttackExecuted;
         public event Action OnEvadeExecuted;
-                public event Action OnPowderExecuted;
+        public event Action OnPowderExecuted;
         public event Action OnExecutionTriggered;
 
         public PlayerCombatState CurrentState { get; private set; } = PlayerCombatState.FreeMovement;
-
-
         public bool IsInvulnerable { get; private set; } = false;
-        public int GunpowderCount { get; private set; } = 3;
-        public int FlintlockAmmo { get; private set; } = 4;
 
-                private PlayerInputManager inputManager;
         private Coroutine activeActionRoutine;
         private bool attackBuffered = false;
         private bool evadeBuffered = false;
         private bool shootBuffered = false;
 
         private void Awake()
-
         {
             inputManager = GetComponent<PlayerInputManager>();
+            inventory = GetComponent<PlayerInventory>();
             if (locomotion == null) locomotion = GetComponent<PlayerLocomotion>();
             if (targetLock == null) targetLock = GetComponent<SoftTargetLock>();
             if (combatLunge == null) combatLunge = GetComponent<CombatLunge>();
@@ -68,7 +64,6 @@ namespace BoneHaven
         private void Update()
         {
             if (CurrentState == PlayerCombatState.DashRoll || CurrentState == PlayerCombatState.ExecutionWindup) return;
-
             if (inputManager == null) return;
 
             Vector3 moveDir = locomotion.GetCameraRelativeDirection(inputManager.move);
@@ -103,7 +98,7 @@ namespace BoneHaven
                     else if (inputManager.powder)
                     {
                         inputManager.powder = false;
-                        if (GunpowderCount > 0) StartPowderThrow();
+                        StartPowderThrow();
                     }
                     else if (inputManager.shoot)
                     {
@@ -112,7 +107,7 @@ namespace BoneHaven
                     }
                     break;
 
-                                case PlayerCombatState.Attack1:
+                case PlayerCombatState.Attack1:
                 case PlayerCombatState.Attack2:
                 case PlayerCombatState.Attack3:
                     if (inputManager.slash)
@@ -126,7 +121,6 @@ namespace BoneHaven
                         shootBuffered = true;
                     }
                     break;
-
             }
         }
 
@@ -143,13 +137,12 @@ namespace BoneHaven
             activeActionRoutine = StartCoroutine(AttackRoutine(comboIndex, moveDir));
         }
 
-                private IEnumerator AttackRoutine(int comboIndex, Vector3 moveDir)
+        private IEnumerator AttackRoutine(int comboIndex, Vector3 moveDir)
         {
             locomotion.LockMovement(true);
             attackBuffered = false;
             evadeBuffered = false;
             shootBuffered = false;
-
 
             Transform target = targetLock != null ? targetLock.GetTarget(new Vector3(inputManager.move.x, 0f, inputManager.move.y), Camera.main.transform) : null;
             if (combatLunge != null) combatLunge.ExecuteLunge(target, moveDir);
@@ -165,6 +158,13 @@ namespace BoneHaven
             float duration = baseDuration / attackSpeedMultiplier;
 
             float dmg = (comboIndex == 3) ? finisherDamage : slashDamage;
+            if (inventory != null && inventory.EquippedSword != null)
+            {
+                dmg = (comboIndex == 3)
+                    ? inventory.EquippedSword.baseDamage * inventory.EquippedSword.heavyAttackMultiplier
+                    : inventory.EquippedSword.baseDamage;
+            }
+
             bool isFinisher = (comboIndex == 3);
 
             CurrentState = comboIndex switch
@@ -184,7 +184,7 @@ namespace BoneHaven
             {
                 elapsed += Time.deltaTime;
 
-                                if (evadeBuffered)
+                if (evadeBuffered)
                 {
                     StartEvade(moveDir);
                     yield break;
@@ -197,7 +197,6 @@ namespace BoneHaven
                 }
 
                 if (attackBuffered && (remainingTime - elapsed) <= (comboBufferWindow / attackSpeedMultiplier))
-
                 {
                     if (comboIndex < 3)
                     {
@@ -282,6 +281,11 @@ namespace BoneHaven
 
         private void StartPowderThrow()
         {
+            if (inventory != null && !inventory.TryConsumePowder())
+            {
+                return;
+            }
+
             if (activeActionRoutine != null) StopCoroutine(activeActionRoutine);
             activeActionRoutine = StartCoroutine(PowderThrowRoutine());
         }
@@ -290,7 +294,6 @@ namespace BoneHaven
         {
             CurrentState = PlayerCombatState.BlackPowderThrow;
             locomotion.LockMovement(true);
-            GunpowderCount--;
             OnPowderExecuted?.Invoke();
 
             yield return new WaitForSeconds(powderThrowDuration * 0.35f);
@@ -316,62 +319,67 @@ namespace BoneHaven
             activeActionRoutine = null;
         }
 
-                private void TryExecutionOrQuickShot(Vector3 moveDir)
+        private void TryExecutionOrQuickShot(Vector3 moveDir)
+        {
+            if (inventory != null && !inventory.TryConsumeAmmo())
+            {
+                return;
+            }
+
+            shootBuffered = false;
+
+            Transform target = targetLock != null ? targetLock.GetTarget(new Vector3(inputManager.move.x, 0f, inputManager.move.y), Camera.main.transform) : null;
+            IDamageable damageable = null;
+            bool isStunnedOrUnbalanced = false;
+
+            if (target != null && target.TryGetComponent(out damageable))
+            {
+                float dist = Vector3.Distance(transform.position, target.position);
+                isStunnedOrUnbalanced = (damageable.IsStunned || damageable.IsUnbalanced) && dist <= (executionRange + 0.5f);
+            }
+
+            if (activeActionRoutine != null) StopCoroutine(activeActionRoutine);
+            activeActionRoutine = StartCoroutine(ExecutionRoutine(target, damageable, isStunnedOrUnbalanced));
+        }
+
+        private IEnumerator ExecutionRoutine(Transform target, IDamageable damageable, bool isFinisher)
+        {
+            CurrentState = PlayerCombatState.ExecutionWindup;
+            locomotion.LockMovement(true);
+
+            if (target != null)
+            {
+                Vector3 lookDir = (target.position - transform.position);
+                lookDir.y = 0f;
+                if (lookDir.sqrMagnitude > 0.01f) transform.rotation = Quaternion.LookRotation(lookDir.normalized);
+            }
+
+            OnExecutionTriggered?.Invoke();
+
+            yield return new WaitForSeconds(executionWindupDuration);
+
+            if (damageable != null && damageable.IsAlive)
+            {
+                if (isFinisher)
                 {
-                    if (FlintlockAmmo <= 0) return;
-                    shootBuffered = false;
-
-                    Transform target = targetLock != null ? targetLock.GetTarget(new Vector3(inputManager.move.x, 0f, inputManager.move.y), Camera.main.transform) : null;
-                    IDamageable damageable = null;
-                    bool isStunnedOrUnbalanced = false;
-
-                    if (target != null && target.TryGetComponent(out damageable))
-                    {
-                        float dist = Vector3.Distance(transform.position, target.position);
-                        isStunnedOrUnbalanced = (damageable.IsStunned || damageable.IsUnbalanced) && dist <= (executionRange + 0.5f);
-                    }
-
-                    // Always start the execution routine/animation regardless of target state
-                    if (activeActionRoutine != null) StopCoroutine(activeActionRoutine);
-                    activeActionRoutine = StartCoroutine(ExecutionRoutine(target, damageable, isStunnedOrUnbalanced));
+                    damageable.Execute(transform);
+                    ApplyExecutionSpeedBuff();
                 }
-
-                private IEnumerator ExecutionRoutine(Transform target, IDamageable damageable, bool isFinisher)
+                else
                 {
-                    CurrentState = PlayerCombatState.ExecutionWindup;
-                    locomotion.LockMovement(true);
-                    FlintlockAmmo--;
-
-                    if (target != null)
+                    float rangedDamage = 30f;
+                    if (inventory != null && inventory.EquippedPistol != null)
                     {
-                        Vector3 lookDir = (target.position - transform.position);
-                        lookDir.y = 0f;
-                        if (lookDir.sqrMagnitude > 0.01f) transform.rotation = Quaternion.LookRotation(lookDir.normalized);
+                        rangedDamage = inventory.EquippedPistol.baseDamage;
                     }
-
-                    OnExecutionTriggered?.Invoke();
-
-                    yield return new WaitForSeconds(executionWindupDuration);
-
-                    if (damageable != null && damageable.IsAlive)
-                    {
-                        if (isFinisher)
-                        {
-                            damageable.Execute(transform);
-                            ApplyExecutionSpeedBuff();
-                        }
-                        else
-                        {
-                            // Regular damage if not stunned/unbalanced
-                            damageable.TakeDamage(30f, target.position, transform.forward);
-                        }
-                    }
-
-                    CurrentState = PlayerCombatState.FreeMovement;
-                    locomotion.LockMovement(false);
-                    activeActionRoutine = null;
+                    damageable.TakeDamage(rangedDamage, target.position, transform.forward);
                 }
+            }
 
+            CurrentState = PlayerCombatState.FreeMovement;
+            locomotion.LockMovement(false);
+            activeActionRoutine = null;
+        }
 
         private void ApplyExecutionSpeedBuff()
         {
@@ -389,7 +397,11 @@ namespace BoneHaven
 
         #endregion
 
-        public void AddGunpowder(int amount) => GunpowderCount = Mathf.Clamp(GunpowderCount + amount, 0, maxGunpowderPouches);
-        public void AddAmmo(int amount) => FlintlockAmmo = Mathf.Clamp(FlintlockAmmo + amount, 0, maxFlintlockAmmo);
+        #region Resource Proxy Methods
+
+        public void AddGunpowder(int amount) => inventory?.AddPowder(amount);
+        public void AddAmmo(int amount) => inventory?.AddAmmo(amount);
+
+        #endregion
     }
 }

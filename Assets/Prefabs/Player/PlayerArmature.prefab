@@ -730,7 +730,8 @@ GameObject:
   - component: {fileID: 7011447443997280696}
   - component: {fileID: 7274578692666738596}
   - component: {fileID: 5500498472166590335}
-  - component: {fileID: 2023170580359493849}
+  - component: {fileID: 6258821028997958468}
+  - component: {fileID: 6707962537020205503}
   m_Layer: 8
   m_Name: PlayerArmature
   m_TagString: Player
@@ -1043,11 +1044,9 @@ MonoBehaviour:
   powderThrowDuration: 0.4
   executionWindupDuration: 0.35
   executionRange: 1.8
-  maxGunpowderPouches: 3
-  maxFlintlockAmmo: 4
   executionSpeedBuffMultiplier: 1.25
   executionBuffDuration: 5
---- !u!114 &2023170580359493849
+--- !u!114 &6258821028997958468
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1056,9 +1055,31 @@ MonoBehaviour:
   m_GameObject: {fileID: 3181576692495615709}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25ec9252e2335f3418a10d658164530c, type: 3}
+  m_Script: {fileID: 11500000, guid: ccbfb2b05ce23db439feda6f43a50675, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BoneHaven.InventoryManager
+  m_EditorClassIdentifier: Assembly-CSharp::BoneHaven.PlayerInventory
+  equippedSword: {fileID: 11400000, guid: 4210e25488b802844aa68b0bb084935b, type: 2}
+  equippedPistol: {fileID: 11400000, guid: c012b7fbbb8f25f45b153525635138c1, type: 2}
+  ownedWeapons:
+  - {fileID: 11400000, guid: 4210e25488b802844aa68b0bb084935b, type: 2}
+  - {fileID: 11400000, guid: c012b7fbbb8f25f45b153525635138c1, type: 2}
+  maxPowder: 3
+  currentPowder: 1
+  maxAmmo: 6
+  currentAmmo: 3
+--- !u!114 &6707962537020205503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3181576692495615709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f97da891bb6e954284f84fe326e435a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoneHaven.PlayerStats
+  maxHealth: 100
 --- !u!1 &3237777468113743914
 GameObject:
   m_ObjectHideFlags: 0

@@ -237,7 +237,11 @@ MonoBehaviour:
     m_Bits: 256
   bombPrefab: {fileID: 0}
   throwPoint: {fileID: 0}
+  powderDropPrefab: {fileID: 178120, guid: 324e0fe631e4561479f3646fb39d4e1d, type: 3}
+  ammoDropPrefab: {fileID: 6070387416761708397, guid: e90599378dbc5b94394d4e2b8d6c643a, type: 3}
+  healthDropPrefab: {fileID: 192770, guid: d786159557cc41848acba7e1cf6ad83e, type: 3}
   currentHealth: 0
+  comboHitCount: 0
 --- !u!1001 &8309853463965939287
 PrefabInstance:
   m_ObjectHideFlags: 0

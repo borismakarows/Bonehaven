@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd0718e7be131884c8ae535e2f74d850, type: 3}
+  m_Name: Cutlass_Default
+  m_EditorClassIdentifier: Assembly-CSharp::BoneHaven.SwordWeaponItem
+  id: 83b0103b-ef58-4375-9a89-0369addd108a
+  weaponName: Cutlass
+  slotType: 0
+  icon: {fileID: 0}
+  weaponModelPrefab: {fileID: 9116027535571227917, guid: f6800fbfb76cb18409dfe580a9e9330c, type: 3}
+  baseDamage: 20
+  attackSpeed: 1
+  heavyAttackMultiplier: 1.5
