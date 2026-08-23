@@ -66,6 +66,9 @@ namespace BoneHaven
             lastHitTime = Time.time;
             comboHitCount++;
 
+            CombatJuiceManager.Instance?.TriggerScreenShake(0.2f);
+            CombatJuiceManager.Instance?.TriggerHitStop(0.04f, 0.2f);
+
             OnDamaged?.Invoke();
 
             if (currentHealth <= 0f)
@@ -105,6 +108,7 @@ namespace BoneHaven
         {
             if (!IsAlive || IsStunned) return;
 
+            // Hit then Powder Stun
             if (Time.time - lastHitTime < 0.8f)
             {
                 TriggerStun();
@@ -142,6 +146,10 @@ namespace BoneHaven
             IsUnbalanced = false;
             comboHitCount = 0;
 
+            
+            CombatJuiceManager.Instance?.TriggerScreenShake(0.4f);
+            CombatJuiceManager.Instance?.TriggerHitStop(0.08f, 0.1f);
+
             if (statusRoutine != null) StopCoroutine(statusRoutine);
             statusRoutine = StartCoroutine(StunRoutine());
 
@@ -167,6 +175,9 @@ namespace BoneHaven
             IsStunned = false;
             IsUnbalanced = false;
 
+            CombatJuiceManager.Instance?.TriggerScreenShake(0.6f);
+            CombatJuiceManager.Instance?.TriggerHitStop(0.12f, 0.05f);
+
             if (statusRoutine != null) StopCoroutine(statusRoutine);
 
             SpawnLoot(true);
@@ -183,7 +194,6 @@ namespace BoneHaven
             Vector3 spawnPos = throwPoint.position;
             GameObject bombObj = null;
 
-            // Spawning via ObjectPooler
             if (ObjectPooler.Instance != null)
             {
                 bombObj = ObjectPooler.Instance.SpawnFromPool(bombPoolTag, spawnPos, Quaternion.identity);
@@ -216,6 +226,8 @@ namespace BoneHaven
             {
                 if (hit.CompareTag("Player") && hit.TryGetComponent(out IDamageable playerDamageable))
                 {
+                    CombatJuiceManager.Instance?.TriggerScreenShake(0.35f);
+
                     Vector3 pushDir = (hit.transform.position - transform.position).normalized;
                     playerDamageable.TakeDamage(damage, hit.bounds.center, pushDir);
                     break;

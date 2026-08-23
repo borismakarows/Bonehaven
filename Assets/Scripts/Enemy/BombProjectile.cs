@@ -106,6 +106,8 @@ namespace BoneHaven
             if (hasExploded) return;
             hasExploded = true;
 
+            CombatJuiceManager.Instance?.TriggerScreenShake(0.5f);
+
             if (audioSource != null && audioSource.isPlaying)
             {
                 audioSource.Stop();
@@ -131,7 +133,7 @@ namespace BoneHaven
                 }
             }
 
-            // Return to pool instead of Destroying
+            // Return to pool
             if (pooledObject != null)
             {
                 pooledObject.ReturnToPool();

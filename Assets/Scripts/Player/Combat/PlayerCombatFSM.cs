@@ -43,6 +43,7 @@ namespace BoneHaven
         public event Action OnEvadeExecuted;
         public event Action OnPowderExecuted;
         public event Action OnExecutionTriggered;
+        public event Action OnDeathExecuted;
 
         public PlayerCombatState CurrentState { get; private set; } = PlayerCombatState.FreeMovement;
         public bool IsInvulnerable { get; private set; } = false;
@@ -63,7 +64,10 @@ namespace BoneHaven
 
         private void Update()
         {
-            if (CurrentState == PlayerCombatState.DashRoll || CurrentState == PlayerCombatState.ExecutionWindup) return;
+            if (CurrentState == PlayerCombatState.DashRoll || 
+                CurrentState == PlayerCombatState.ExecutionWindup || 
+                CurrentState == PlayerCombatState.Downed) return;
+
             if (inputManager == null) return;
 
             Vector3 moveDir = locomotion.GetCameraRelativeDirection(inputManager.move);
@@ -72,17 +76,14 @@ namespace BoneHaven
             if (inputManager.evade)
             {
                 inputManager.evade = false;
-                if (CurrentState != PlayerCombatState.ExecutionWindup && CurrentState != PlayerCombatState.Downed)
+                if (CurrentState == PlayerCombatState.FreeMovement)
                 {
-                    if (CurrentState == PlayerCombatState.FreeMovement)
-                    {
-                        StartEvade(moveDir);
-                        return;
-                    }
-                    else if (IsAttackingState())
-                    {
-                        evadeBuffered = true;
-                    }
+                    StartEvade(moveDir);
+                    return;
+                }
+                else if (IsAttackingState())
+                {
+                    evadeBuffered = true;
                 }
             }
 
@@ -397,10 +398,21 @@ namespace BoneHaven
 
         #endregion
 
-        #region Resource Proxy Methods
+        #region Death Handler
 
-        public void AddGunpowder(int amount) => inventory?.AddPowder(amount);
-        public void AddAmmo(int amount) => inventory?.AddAmmo(amount);
+        public void TriggerPlayerDeath()
+        {
+            if (CurrentState == PlayerCombatState.Downed) return;
+
+            CurrentState = PlayerCombatState.Downed;
+            if (activeActionRoutine != null) StopCoroutine(activeActionRoutine);
+            if (buffRoutine != null) StopCoroutine(buffRoutine);
+
+            locomotion.LockMovement(true);
+            IsInvulnerable = true;
+
+            OnDeathExecuted?.Invoke();
+        }
 
         #endregion
     }

@@ -234,8 +234,9 @@ MonoBehaviour:
   attackRadius: 1.2
   playerLayer:
     serializedVersion: 2
-    m_Bits: 0
-  bombPrefab: {fileID: 7167238520998336806, guid: 740c6d5a9dd02504792ac12480c29f8e, type: 3}
+    m_Bits: 256
+  bombPoolTag: BombProjectile
+  bombPrefabFallback: {fileID: 0}
   throwPoint: {fileID: 6915765822099955714}
   powderDropPrefab: {fileID: 178120, guid: 324e0fe631e4561479f3646fb39d4e1d, type: 3}
   ammoDropPrefab: {fileID: 6070387416761708397, guid: e90599378dbc5b94394d4e2b8d6c643a, type: 3}

@@ -1,35 +1,51 @@
+using System;
 using UnityEngine;
 
 namespace BoneHaven
 {
     public class PlayerStats : MonoBehaviour, IDamageable
     {
+        [Header("Health Settings")]
         [SerializeField] private float maxHealth = 100f;
-        public float CurrentHealth { get; private set; }
+        [SerializeField] private float currentHealth;
 
-        public bool IsAlive => CurrentHealth > 0;
-        public bool IsStunned => false;      // Player için gerekmiyorsa false
-        public bool IsUnbalanced => false;   // Player için gerekmiyorsa false
+        public float CurrentHealth => currentHealth;
+        public float MaxHealth => maxHealth;
+        public bool IsAlive => currentHealth > 0f;
+        public bool IsStunned => false;
+        public bool IsUnbalanced => false;
+
+        public static event Action<float, float> OnHealthChanged;
+        public static event Action OnPlayerDied;
+
+        private PlayerCombatFSM combatFSM;
 
         private void Awake()
         {
-            CurrentHealth = maxHealth;
+            currentHealth = maxHealth;
+            combatFSM = GetComponent<PlayerCombatFSM>();
+        }
+
+        private void Start()
+        {
+            OnHealthChanged?.Invoke(currentHealth, maxHealth);
         }
 
         public void TakeDamage(float damage, Vector3 hitPoint, Vector3 hitDirection)
         {
             if (!IsAlive) return;
 
-            // PlayerCombatFSM üzerindeki i-frame (dash) kontrolü
-            if (TryGetComponent(out PlayerCombatFSM combatFSM) && combatFSM.IsInvulnerable)
-            {
-                return;
-            }
+         
+            if (combatFSM != null && combatFSM.IsInvulnerable) return;
 
-            CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
-            Debug.Log($"Player damaged! Remaining: {CurrentHealth}");
+            currentHealth = Mathf.Max(0f, currentHealth - damage);
+            OnHealthChanged?.Invoke(currentHealth, maxHealth);
 
-            if (CurrentHealth <= 0)
+            
+            CombatJuiceManager.Instance?.TriggerScreenShake(0.35f);
+            CombatJuiceManager.Instance?.TriggerHitStop(0.05f, 0.2f);
+
+            if (currentHealth <= 0f)
             {
                 Die();
             }
@@ -38,16 +54,20 @@ namespace BoneHaven
         public void Heal(float amount)
         {
             if (!IsAlive) return;
-            CurrentHealth = Mathf.Min(maxHealth, CurrentHealth + amount);
-            Debug.Log($"Player healed! Current: {CurrentHealth}");
+            currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
+            OnHealthChanged?.Invoke(currentHealth, maxHealth);
         }
 
-        public void ApplyBlackPowder() { } 
+        public void ApplyBlackPowder() { }
         public void Execute(Transform attacker) { }
 
         private void Die()
         {
-            Debug.Log("Player Died!");
+            OnPlayerDied?.Invoke();
+            if (combatFSM != null)
+            {
+                combatFSM.TriggerPlayerDeath();
+            }
         }
     }
 }
