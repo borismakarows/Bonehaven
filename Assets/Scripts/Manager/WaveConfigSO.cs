@@ -9,7 +9,8 @@ namespace BoneHaven
     {
         public EnemyConfigSO enemyConfig;
         public int count;
-        public float spawnDelay;
+        [Tooltip("Delay AFTER this entire group batch is spawned before moving to the next group")]
+        public float delayAfterGroup;
     }
 
     [CreateAssetMenu(fileName = "NewWaveConfig", menuName = "BoneHaven/Wave Config")]
@@ -24,6 +25,6 @@ namespace BoneHaven
         public float initialWaveDelay = 2.0f;
 
         [Header("Progression Rewards")]
-        public GameObject progressionReward; // Fortress Gate Key (Wave 1) or Ship Key (Wave 2)
+        public GameObject progressionReward;
     }
 }
