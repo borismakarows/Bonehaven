@@ -821,6 +821,7 @@ GameObject:
   - component: {fileID: 7011447443997280696}
   - component: {fileID: 7274578692666738596}
   - component: {fileID: 5500498472166590335}
+  - component: {fileID: 2291914797509714494}
   m_Layer: 8
   m_Name: PlayerArmature
   m_TagString: Player
@@ -1003,8 +1004,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87bfab84f174e054fabe2b0d7f0f9f95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoneHaven.PlayerAnimationController
-  locomotion: {fileID: 0}
-  combatFSM: {fileID: 0}
 --- !u!114 &1015585283773811495
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1024,7 +1023,7 @@ MonoBehaviour:
   slash: 0
   powder: 0
   shoot: 0
-  dash: 0
+  evade: 0
   analogMovement: 0
   cursorLocked: 1
   cursorInputForLook: 1
@@ -1052,15 +1051,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26e54e5a728a9234ab24fcf1460ed8a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cinemachineCameraTarget: {fileID: 0}
-  topClamp: 70
-  bottomClamp: -30
-  cameraAngleOverride: 0
-  lockCameraPosition: 0
-  walkSpeed: 1.2
-  runSpeed: 3.8
-  speedChangeRate: 10
-  rotationSmoothTime: 0.12
+  MoveSpeed: 3
+  SprintSpeed: 8.1
+  RotationSmoothTime: 0.12
+  SpeedChangeRate: 10
+  CinemachineCameraTarget: {fileID: 8666323792065867653}
+  TopClamp: 70
+  BottomClamp: -30
+  CameraAngleOverride: 0
+  LockCameraPosition: 0
 --- !u!114 &3617531292775697289
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1101,7 +1100,7 @@ MonoBehaviour:
   slash: 0
   powder: 0
   shoot: 0
-  dash: 0
+  evade: 0
   analogMovement: 0
   cursorLocked: 1
   cursorInputForLook: 1
@@ -1131,27 +1130,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 653185ae950210d4ea60dcd39917dafc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoneHaven.PlayerCombatFSM
-  dashSpeed: 10
-  dashDuration: 0.35
-  iFrameDuration: 0.2
-  attack1Duration: 0.45
-  attack2Duration: 0.45
-  attack3Duration: 0.65
+  evadeSpeed: 5
+  evadeDuration: 0.75
+  iFrameDuration: 0.25
+  attack1Duration: 0.35
+  attack2Duration: 0.5
+  attack3Duration: 0.7
   comboBufferWindow: 0.25
   slashDamage: 20
   finisherDamage: 40
   meleeHitboxRadius: 1.6
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
   powderThrowDuration: 0.4
   executionWindupDuration: 0.35
   executionRange: 1.8
   maxGunpowderPouches: 3
   maxFlintlockAmmo: 4
-  locomotion: {fileID: 0}
-  targetLock: {fileID: 0}
-  combatLunge: {fileID: 0}
+  executionSpeedBuffMultiplier: 1.25
+  executionBuffDuration: 5
+--- !u!81 &2291914797509714494
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3181576692495615709}
+  m_Enabled: 1
 --- !u!1 &3237777468113743914
 GameObject:
   m_ObjectHideFlags: 0
@@ -4863,7 +4869,7 @@ Transform:
   m_GameObject: {fileID: 8666323792065867653}
   serializedVersion: 2
   m_LocalRotation: {x: 0.02731161, y: 0.023177264, z: 0.00063341105, w: 0.99935806}
-  m_LocalPosition: {x: 0.521, y: 1.406, z: 0.348}
+  m_LocalPosition: {x: -0.119, y: 1.404, z: 0.378}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
