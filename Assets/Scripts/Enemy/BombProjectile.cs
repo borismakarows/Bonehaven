@@ -7,19 +7,21 @@ namespace BoneHaven
     public class BombProjectile : MonoBehaviour
     {
         [Header("Fuse & Explosion Timing")]
-        [SerializeField] private float fuseTime = 2.5f; // Bombanın patlamadan önceki geri sayım süresi
+        [SerializeField] private float fuseTime = 2.5f;
         [SerializeField] private float explosionRadius = 2.5f;
         [SerializeField] private float explosionDamage = 20f;
         [SerializeField] private LayerMask damageableLayers;
 
         [Header("Effects & Audio")]
         [SerializeField] private GameObject explosionVFXPrefab;
-        [SerializeField] private AudioClip fuseBurnSFX; // Fitil yanma sesi (döngüde çalar)
-        [SerializeField] private AudioClip explosionSFX; // Patlama sesi
+        [SerializeField] private AudioClip fuseBurnSFX;
+        [SerializeField] private AudioClip explosionSFX;
 
         private Rigidbody rb;
         private SphereCollider bombCollider;
         private AudioSource audioSource;
+        private PooledObject pooledObject;
+        private Coroutine fuseRoutine;
         private bool hasExploded = false;
 
         private void Awake()
@@ -27,25 +29,43 @@ namespace BoneHaven
             rb = GetComponent<Rigidbody>();
             bombCollider = GetComponent<SphereCollider>();
             audioSource = GetComponent<AudioSource>();
+            pooledObject = GetComponent<PooledObject>();
 
-            rb.useGravity = true;
-            rb.isKinematic = false;
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-            // Fitil ses ayarları
             audioSource.playOnAwake = false;
             audioSource.loop = true;
         }
 
+        private void OnEnable()
+        {
+            hasExploded = false;
+            rb.useGravity = true;
+            rb.isKinematic = false;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        private void OnDisable()
+        {
+            if (fuseRoutine != null)
+            {
+                StopCoroutine(fuseRoutine);
+                fuseRoutine = null;
+            }
+            if (audioSource != null && audioSource.isPlaying)
+            {
+                audioSource.Stop();
+            }
+        }
+
         public void Launch(Vector3 targetPosition, Collider throwerCollider, float flightDuration = 1.0f)
         {
-            // Fırlatan düşman ile bombanın birbirine takılmasını engelle
             if (throwerCollider != null && bombCollider != null)
             {
                 Physics.IgnoreCollision(throwerCollider, bombCollider, true);
             }
 
-            // Parabolik hız hesabı
             Vector3 startPos = transform.position;
             Vector3 displacement = targetPosition - startPos;
             Vector3 displacementXZ = new Vector3(displacement.x, 0f, displacement.z);
@@ -61,15 +81,11 @@ namespace BoneHaven
 
             Vector3 finalVelocity = velocityXZ + Vector3.up * velocityY;
 
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
             rb.linearVelocity = finalVelocity;
-
-            // Havada takla atarak gitmesi için tork
             rb.AddTorque(Random.insideUnitSphere * 6f, ForceMode.Impulse);
 
-            // Fitil sesini başlat ve geri sayım coroutine'ini çalıştır
-            StartCoroutine(FuseCountdownRoutine());
+            if (fuseRoutine != null) StopCoroutine(fuseRoutine);
+            fuseRoutine = StartCoroutine(FuseCountdownRoutine());
         }
 
         private IEnumerator FuseCountdownRoutine()
@@ -80,7 +96,6 @@ namespace BoneHaven
                 audioSource.Play();
             }
 
-            // Süre dolana kadar bekle (Çarpışmalar patlatmaz, bomba yerde sekip yuvarlanır)
             yield return new WaitForSeconds(fuseTime);
 
             Explode();
@@ -91,25 +106,21 @@ namespace BoneHaven
             if (hasExploded) return;
             hasExploded = true;
 
-            // Fitil sesini durdur
             if (audioSource != null && audioSource.isPlaying)
             {
                 audioSource.Stop();
             }
 
-            // Patlama sesini ayrı çal (Bomba yok olacağı için PlayClipAtPoint kullanılır)
             if (explosionSFX != null)
             {
                 AudioSource.PlayClipAtPoint(explosionSFX, transform.position, 1.0f);
             }
 
-            // Patlama görsel efekti
             if (explosionVFXPrefab != null)
             {
                 Instantiate(explosionVFXPrefab, transform.position, Quaternion.identity);
             }
 
-            // Alan hasarı ve oyuncu kontrolü
             Collider[] hits = Physics.OverlapSphere(transform.position, explosionRadius, damageableLayers);
             foreach (var hit in hits)
             {
@@ -120,7 +131,19 @@ namespace BoneHaven
                 }
             }
 
-            Destroy(gameObject);
+            // Return to pool instead of Destroying
+            if (pooledObject != null)
+            {
+                pooledObject.ReturnToPool();
+            }
+            else if (ObjectPooler.Instance != null)
+            {
+                ObjectPooler.Instance.ReturnToPool("BombProjectile", gameObject);
+            }
+            else
+            {
+                gameObject.SetActive(false);
+            }
         }
 
         private void OnDrawGizmosSelected()

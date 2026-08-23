@@ -679,11 +679,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330555889}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &339234967 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3181576692495615709, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
-  m_PrefabInstance: {fileID: 1490415431}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &398609083
 GameObject:
   m_ObjectHideFlags: 0
@@ -2950,14 +2945,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 2023170580359493849, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3181576692495615709, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1668199093}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
 --- !u!4 &1490415433 stripped
 Transform:
@@ -3201,6 +3192,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3941165642236152847, guid: 6d821fbbfada3804bbc70b79d1d9a68a, type: 3}
+      propertyPath: attackPoint
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3941165642236152847, guid: 6d821fbbfada3804bbc70b79d1d9a68a, type: 3}
+      propertyPath: playerLayer.m_Bits
+      value: 256
+      objectReference: {fileID: 0}
     - target: {fileID: 5625670132388869448, guid: 6d821fbbfada3804bbc70b79d1d9a68a, type: 3}
       propertyPath: player
       value: 
@@ -3259,19 +3258,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8328596594160030762, guid: f16cb18363a1712469bbc227e2e49bc7, type: 3}
   m_PrefabInstance: {fileID: 1490415431}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1668199093
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 339234967}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f97da891bb6e954284f84fe326e435a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BoneHaven.PlayerStats
-  maxHealth: 100
 --- !u!1 &1677265356
 GameObject:
   m_ObjectHideFlags: 0
@@ -4991,11 +4977,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1088945857743949519, guid: 2fd6d4629fa879940b6417e51ba1d095, type: 3}
       propertyPath: pools.Array.size
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1088945857743949519, guid: 2fd6d4629fa879940b6417e51ba1d095, type: 3}
       propertyPath: pools.Array.data[0].tag
-      value: SlashVFX
+      value: BombProjectile
       objectReference: {fileID: 0}
     - target: {fileID: 1088945857743949519, guid: 2fd6d4629fa879940b6417e51ba1d095, type: 3}
       propertyPath: pools.Array.data[1].tag
@@ -5008,6 +4994,14 @@ PrefabInstance:
     - target: {fileID: 1088945857743949519, guid: 2fd6d4629fa879940b6417e51ba1d095, type: 3}
       propertyPath: pools.Array.data[3].tag
       value: DamagePopUp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1088945857743949519, guid: 2fd6d4629fa879940b6417e51ba1d095, type: 3}
+      propertyPath: pools.Array.data[0].prefab
+      value: 
+      objectReference: {fileID: 7167238520998336806, guid: 740c6d5a9dd02504792ac12480c29f8e, type: 3}
+    - target: {fileID: 1088945857743949519, guid: 2fd6d4629fa879940b6417e51ba1d095, type: 3}
+      propertyPath: pools.Array.data[0].initialSize
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1178808797183933050, guid: 2fd6d4629fa879940b6417e51ba1d095, type: 3}
       propertyPath: m_Name

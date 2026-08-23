@@ -19,7 +19,8 @@ namespace BoneHaven
         [SerializeField] private LayerMask playerLayer;
 
         [Header("Ranged Attack Settings")]
-        [SerializeField] private GameObject bombPrefab;
+        [SerializeField] private string bombPoolTag = "BombProjectile";
+        [SerializeField] private GameObject bombPrefabFallback;
         [SerializeField] private Transform throwPoint;
 
         [Header("Loot Drop Prefabs")]
@@ -27,14 +28,13 @@ namespace BoneHaven
         [SerializeField] private GameObject ammoDropPrefab;
         [SerializeField] private GameObject healthDropPrefab;
 
-
         [Header("State Status")]
         [SerializeField] private float currentHealth;
         public bool IsAlive => currentHealth > 0f;
         public bool IsStunned { get; private set; } = false;
         public bool IsUnbalanced { get; private set; } = false;
 
-                private AI aiController;
+        private AI aiController;
         private Coroutine statusRoutine;
         
         [Header("Combo & Stun Tracking")]
@@ -44,7 +44,6 @@ namespace BoneHaven
         private int hitsReceivedWhilePowdered = 0;
 
         public event Action OnDamaged;
-
         public event Action OnStunStateEntered;
         public event Action OnDeath;
 
@@ -57,11 +56,10 @@ namespace BoneHaven
             }
         }
 
-                public void TakeDamage(float amount, Vector3 hitPoint, Vector3 hitDirection)
+        public void TakeDamage(float amount, Vector3 hitPoint, Vector3 hitDirection)
         {
             if (!IsAlive) return;
 
-            // Update Combo Logic
             if (Time.time - lastHitTime > comboResetDuration) comboHitCount = 0;
             
             currentHealth = Mathf.Max(0f, currentHealth - amount);
@@ -75,8 +73,6 @@ namespace BoneHaven
                 Die();
                 return;
             }
-
-            // --- STUN CONDITIONS ---
 
             // 1. Combo Stun (3 Hits)
             if (comboHitCount >= 3)
@@ -98,19 +94,17 @@ namespace BoneHaven
                 }
             }
 
-            // 3. Normal Darbe Tepkisi (Stun değilken)
+            // 3. Hurt Reaction
             if (!IsStunned)
             {
                 aiController.TriggerHurt(hitDirection);
             }
         }
 
-
-                public void ApplyBlackPowder()
+        public void ApplyBlackPowder()
         {
             if (!IsAlive || IsStunned) return;
 
-            // 3. Hit then Powder Stun (within 0.8s of being hit)
             if (Time.time - lastHitTime < 0.8f)
             {
                 TriggerStun();
@@ -126,7 +120,6 @@ namespace BoneHaven
             aiController.TriggerUnbalanced();
         }
 
-
         private IEnumerator UnbalancedRoutine()
         {
             float duration = config != null ? config.unbalancedDuration : 1.2f;
@@ -141,7 +134,7 @@ namespace BoneHaven
             }
         }
 
-                private void TriggerStun()
+        private void TriggerStun()
         {
             if (!IsAlive) return;
 
@@ -155,7 +148,6 @@ namespace BoneHaven
             OnStunStateEntered?.Invoke();
             aiController.TriggerStun();
         }
-
 
         private IEnumerator StunRoutine()
         {
@@ -183,16 +175,27 @@ namespace BoneHaven
 
         public void OnBombThrowAnimationEvent()
         {
-            if (!IsAlive || bombPrefab == null || throwPoint == null) return;
+            if (!IsAlive || throwPoint == null) return;
 
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj == null) return;
 
             Vector3 spawnPos = throwPoint.position;
-            GameObject bombObj = Instantiate(bombPrefab, spawnPos, Quaternion.identity);
+            GameObject bombObj = null;
+
+            // Spawning via ObjectPooler
+            if (ObjectPooler.Instance != null)
+            {
+                bombObj = ObjectPooler.Instance.SpawnFromPool(bombPoolTag, spawnPos, Quaternion.identity);
+            }
+            else if (bombPrefabFallback != null)
+            {
+                bombObj = Instantiate(bombPrefabFallback, spawnPos, Quaternion.identity);
+            }
+
+            if (bombObj == null) return;
 
             Collider enemyCollider = GetComponent<Collider>();
-
             if (bombObj.TryGetComponent(out BombProjectile projectile))
             {
                 Vector3 targetPos = playerObj.transform.position;
@@ -215,7 +218,7 @@ namespace BoneHaven
                 {
                     Vector3 pushDir = (hit.transform.position - transform.position).normalized;
                     playerDamageable.TakeDamage(damage, hit.bounds.center, pushDir);
-                    break; // Stop after hitting the player once
+                    break;
                 }
             }
         }
@@ -233,7 +236,6 @@ namespace BoneHaven
         {
             Vector3 spawnPos = transform.position + Vector3.up * 0.5f;
 
-            // Guaranteed drop on execution
             if (guaranteedHealth && healthDropPrefab != null)
             {
                 Instantiate(healthDropPrefab, spawnPos, Quaternion.identity);
@@ -241,7 +243,6 @@ namespace BoneHaven
 
             if (config == null) return;
 
-            // Roll for Gunpowder
             if (powderDropPrefab != null && UnityEngine.Random.value <= config.gunpowderDropChance)
             {
                 Vector3 offset = UnityEngine.Random.insideUnitSphere * 0.4f;
@@ -249,7 +250,6 @@ namespace BoneHaven
                 Instantiate(powderDropPrefab, spawnPos + offset, Quaternion.identity);
             }
 
-            // Roll for Ammo
             if (ammoDropPrefab != null && UnityEngine.Random.value <= config.ammoDropChance)
             {
                 Vector3 offset = UnityEngine.Random.insideUnitSphere * 0.4f;
