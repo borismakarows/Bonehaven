@@ -13,6 +13,7 @@ Window -> AI -> Navigation and click "Bake".
 d. Press Play in the Editor toolbar to test the encounter.
 
 3. CONTROLS
+---
 
 * Move:                  W / A / S / D
 * Walk / Sprint:         Shift (Hold to walk, Default: Run)
@@ -28,22 +29,26 @@ d. Press Play in the Editor toolbar to test the encounter.
 All core managers and systems are modular prefabs located in Assets/Prefabs/:
 
 A. Managers:
+
 * CombatJuiceManager: Micro hit-stops (Time.timeScale) and camera shakes.
 * ObjectPooler: Pre-allocates and recycles projectile instances (BombProjectile).
 * WaveSpawner: Dynamic squad spacing, NavMesh area sampling, and encounter lifecycle.
 
 B. Camera & UI:
+
 * MainCamera, PlayerFollowCamera: Main Camera with CinemachineBrain, Impulse Listener, and Virtual Camera.
 * Combat_Hud : Displays Player HP, Powder count, Ammo count, and equipped weapons.
 
 C. Characters & Enemies:
+
 * Player: CharacterController, Locomotion, PlayerCombatFSM, Stats, Inventory, and Target Locking.
 * Deckhand_Enemy: Melee enemy configured with AI, NavMeshAgent, EnemyCombatManager, and EnemyConfigSO.
 * Bombardier_Enemy: Ranged lobber configured with projectile throw arcs and fuse timing.
 
 D. Projectiles & Triggers:
-* Bomb_Projectile: PooledObject with BombProjectile logic and explosion radius.
-* BattleTriggerZone: Box trigger collider managing battle activation and wave asset execution.
+
+* PF_Bomb_Projectile: PooledObject with BombProjectile logic and explosion radius.
+* PF_BattleTriggerZone: Box trigger collider managing battle activation and wave asset execution.
 
 4. TECHNICAL ARCHITECTURE & DESIGN PATTERNS
 * Pathfinding:
@@ -86,6 +91,6 @@ D. Projectiles & Triggers:
 
 FOR the Latest Version:
 Clone the repository:
-git clone [https://github.com/borismakarows/Bonehaven.git]
+git clone [https://github.com/borismakarows/Bonehaven.git](https://www.google.com/search?q=https://github.com/borismakarows/Bonehaven.git)
 
 
